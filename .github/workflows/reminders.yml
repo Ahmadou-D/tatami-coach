@@ -1,0 +1,26 @@
+name: Rappels
+on:
+  schedule:
+    # every hour at :25 (UTC); the script only sends what is due in Paris time
+    - cron: '25 * * * *'
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 'Envoyer une notification de test maintenant'
+        type: boolean
+        default: true
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install --no-save web-push@3.6.7
+      - run: node scripts/push.mjs
+        env:
+          PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
+          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          FORCE_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test }}

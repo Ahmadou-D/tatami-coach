@@ -1,0 +1,8 @@
+{
+  "timezone": "Europe/Paris",
+  "reminders": [
+    { "days": [1], "time": "07:30", "title": "Lundi = pesée", "body": "À jeun, après les toilettes. Note-la dans l'appli." },
+    { "days": [0, 1, 2, 3, 4, 5, 6], "time": "09:00", "title": "Créatine", "body": "5 g, dans ton shake ou un verre d'eau. Une case du minimum en 10 secondes." },
+    { "days": [0, 1, 2, 3, 4, 5, 6], "time": "21:30", "title": "Mobilité du soir", "body": "Pigeon droit, grenouille, pigeon gauche. 10 minutes et c'est validé." }
+  ]
+}
