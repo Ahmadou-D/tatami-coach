@@ -21,6 +21,5 @@ jobs:
       - run: npm install --no-save web-push@3.6.7
       - run: node scripts/push.mjs
         env:
-          PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
-          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          PUSH_CONFIG: ${{ secrets.PUSH_CONFIG }}
           FORCE_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test }}
