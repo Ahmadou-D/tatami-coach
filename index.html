@@ -198,7 +198,7 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 /* ========== icônes ========== */
 const IC = {
-  barcode: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14"/></svg>',
+  barcode: '<svg class="ic" viewBox="0 0 24 24" width="20" height="20"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14"/></svg>',
   today: '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   food: '<svg class="ic" viewBox="0 0 24 24"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10"/><path d="M17 21V3c-2 1-3 4-3 7s1 4 3 4"/></svg>',
   gym: '<svg class="ic" viewBox="0 0 24 24"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg>',
@@ -1218,13 +1218,15 @@ function renderSheet() {
 function mealChips(sel) { return `<div class="chips">${MEALS.map(([k, l]) => `<button class="chip ${sel === k ? 'on' : ''}" data-a="sheetMeal" data-x="${k}">${l}</button>`).join('')}</div>`; }
 function shAddFood(s) {
   const res = searchFoods(s.q || '');
-  const rec = !s.q ? myFoods().slice(0, s.all ? 400 : 15) : [];
-  const nMine = myFoods().length;
+  const ft = UI.foodTab || 'rec';
+  const mine = myFoods(); const nMine = mine.length;
+  const sorted = ft === 'freq' ? mine.slice().sort((a, b) => (b.uses || 0) - (a.uses || 0) || (b.last || 0) - (a.last || 0)) : mine;
+  const rec = !s.q ? sorted.slice(0, s.all ? 400 : 15) : [];
   return sheetHead('Ajouter un aliment') + mealChips(s.meal) +
   `<button class="btn full" data-a="scan">${IC.barcode} Scanner un code-barres</button>
   <input id="food-q" type="search" placeholder="Rechercher : poulet, riz, skyr…" value="${esc(s.q || '')}" autocomplete="off" data-in="foodq">
   ${s.q ? `<div class="list">${res.map(f => `<button class="item" data-a="pickFood" data-x="${esc(f.id)}"><span class="n">${esc(f.n)}<br><span class="mut small">${esc(f.cat || '')}</span></span><span class="k">${r0(f.k)} kcal · ${r1(f.p)} P /100 g</span></button>`).join('') || `<div class="empty">Rien trouvé. Essaie un autre mot, ou utilise l'estimation par description.</div>`}</div>` :
-  `${rec.length ? `<div class="row sp"><span class="lbl">Mes aliments (${nMine})</span>${nMine > 15 ? `<button class="chip" data-a="allMine">${s.all ? 'Récents' : 'Tout voir'}</button>` : ''}</div><div class="list">${rec.map(f => `<button class="item" data-a="pickFood" data-x="${esc(f.id)}"><span class="n">${esc(f.n)}</span><span class="k">${r0(f.g)} g · ${r0(f.per.k * (f.g || 100) / 100)} kcal</span></button>`).join('')}</div>` : `<div class="tip">Tout ce que tu notes est gardé ici pour toujours, avec ta dernière quantité. Plus besoin de le rechercher.</div>`}
+  `${rec.length ? `<div class="seg" role="tablist">${[['rec', 'Récents'], ['freq', 'Fréquents']].map(([k, l]) => `<button data-a="foodTab" data-x="${k}" class="${ft === k ? 'on' : ''}" role="tab" aria-selected="${ft === k}">${l}</button>`).join('')}</div><div class="list">${rec.map(f => `<button class="item" data-a="pickFood" data-x="${esc(f.id)}"><span class="n">${esc(f.n)}${ft === 'freq' && f.uses ? `<br><span class="mut small">${f.uses} fois</span>` : ''}</span><span class="k">${r0(f.g)} g · ${r0(f.per.k * (f.g || 100) / 100)} kcal</span></button>`).join('')}</div>${nMine > 15 ? `<button class="btn ghost full sm" data-a="allMine">${s.all ? 'Voir moins' : `Tout voir (${nMine})`}</button>` : ''}` : `<div class="tip">Tout ce que tu notes est gardé ici pour toujours, avec ta dernière quantité. Plus besoin de le rechercher.</div>`}
   <span class="lbl">Raccourcis</span><div class="chips">${['Whey (poudre)', 'Skyr nature', 'Œuf entier', 'Blanc de poulet cuit', 'Riz blanc cuit', 'Pâtes cuites', 'Banane', 'Steak haché 5 % cuit'].map(n => { const f = FOODS.find(x => x.n === n); return f ? `<button class="chip" data-a="pickFood" data-x="${f.id}">${esc(n)}</button>` : ''; }).join('')}</div>`}
   <div class="grid2"><button class="btn sm" data-a="estimate">${IC.cam} Photo / description</button><button class="btn sm" data-a="customFood">${IC.plus} Aliment perso</button></div>`;
 }
@@ -1533,6 +1535,7 @@ const A = {
     if (needKg) { const el = document.getElementById(needKg); if (el) el.focus(); return false; }
   },
   doneAll: x => { const a = active(); if (!a) return; const it = a.items[+x]; for (let i = 0; i < it.sets.length; i++) { if (!active().items[+x].sets[i].done && A.doneSet(x, String(i)) === false) break; } },
+  foodTab: x => { UI.foodTab = x; UI.sheet.all = false; renderSheet(); },
   allMine: () => { UI.sheet.all = !UI.sheet.all; renderSheet(); },
   forgetFood: x => { Store.set('myfoods', { kind: 'myfoods', list: myFoods().filter(f => f.id !== x) }); toast('Retiré de Mes aliments'); openSheet({ t: 'addFood', meal: UI.sheet.meal, q: '' }); },
   setType: (x, i) => { updActive(a => { const s = a.items[+x].sets[+i]; s.t = s.t === 'w' ? 'n' : 'w'; }); renderSession(); },
