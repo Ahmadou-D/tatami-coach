@@ -162,6 +162,11 @@ svg.ic{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;strok
 .confirm{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:12px;background:rgba(240,124,124,.08);border:1px solid #5a2b2b}
 .tip{font-size:14px;color:var(--mut);border-left:3px solid var(--acc);padding-left:10px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+#scan{position:fixed;inset:0;z-index:120;background:#000;display:flex;flex-direction:column}
+#scan video{flex:1;width:100%;height:100%;object-fit:cover;min-height:0}
+#scan .box{position:absolute;left:10%;right:10%;top:28%;height:22%;border:3px solid var(--acc,#8ab4ff);border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.35);pointer-events:none}
+#scan .bar{background:var(--bg);padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+#scan .bar .row{display:flex;gap:8px}#scan .bar input{flex:1}
 </style>
 
 <div id="view" aria-live="polite"></div>
@@ -193,6 +198,7 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 /* ========== icônes ========== */
 const IC = {
+  barcode: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14"/></svg>',
   today: '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   food: '<svg class="ic" viewBox="0 0 24 24"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10"/><path d="M17 21V3c-2 1-3 4-3 7s1 4 3 4"/></svg>',
   gym: '<svg class="ic" viewBox="0 0 24 24"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg>',
@@ -1203,7 +1209,8 @@ function shAddFood(s) {
   const rec = !s.q ? myFoods().slice(0, s.all ? 400 : 15) : [];
   const nMine = myFoods().length;
   return sheetHead('Ajouter un aliment') + mealChips(s.meal) +
-  `<input id="food-q" type="search" placeholder="Rechercher : poulet, riz, skyr…" value="${esc(s.q || '')}" autocomplete="off" data-in="foodq">
+  `<button class="btn full" data-a="scan">${IC.barcode} Scanner un code-barres</button>
+  <input id="food-q" type="search" placeholder="Rechercher : poulet, riz, skyr…" value="${esc(s.q || '')}" autocomplete="off" data-in="foodq">
   ${s.q ? `<div class="list">${res.map(f => `<button class="item" data-a="pickFood" data-x="${esc(f.id)}"><span class="n">${esc(f.n)}<br><span class="mut small">${esc(f.cat || '')}</span></span><span class="k">${r0(f.k)} kcal · ${r1(f.p)} P /100 g</span></button>`).join('') || `<div class="empty">Rien trouvé. Essaie un autre mot, ou utilise l'estimation par description.</div>`}</div>` :
   `${rec.length ? `<div class="row sp"><span class="lbl">Mes aliments (${nMine})</span>${nMine > 15 ? `<button class="chip" data-a="allMine">${s.all ? 'Récents' : 'Tout voir'}</button>` : ''}</div><div class="list">${rec.map(f => `<button class="item" data-a="pickFood" data-x="${esc(f.id)}"><span class="n">${esc(f.n)}</span><span class="k">${r0(f.g)} g · ${r0(f.per.k * (f.g || 100) / 100)} kcal</span></button>`).join('')}</div>` : `<div class="tip">Tout ce que tu notes est gardé ici pour toujours, avec ta dernière quantité. Plus besoin de le rechercher.</div>`}
   <span class="lbl">Raccourcis</span><div class="chips">${['Whey (poudre)', 'Skyr nature', 'Œuf entier', 'Blanc de poulet cuit', 'Riz blanc cuit', 'Pâtes cuites', 'Banane', 'Steak haché 5 % cuit'].map(n => { const f = FOODS.find(x => x.n === n); return f ? `<button class="chip" data-a="pickFood" data-x="${f.id}">${esc(n)}</button>` : ''; }).join('')}</div>`}
@@ -1254,8 +1261,8 @@ function shIdeas(s) {
 }
 function ideaCard(i, ai) { return `<div class="card" style="background:var(--s2)"><div class="row sp"><h3>${esc(i.t)}</h3>${ai ? '<span class="pill acc">Claude</span>' : ''}</div><div class="mut small">${esc(i.d)}</div><div class="row wrap"><span class="pill">${r0(i.k)} kcal</span><span class="pill warn">${r0(i.p)} g protéines</span>${i.min ? `<span class="pill">${r0(i.min)} min</span>` : ''}</div></div>`; }
 function shCustomFood(s) {
-  return sheetHead('Aliment perso') + `<div class="mut small">Recopie l'étiquette, valeurs pour 100 g.</div>
-  <div class="field"><label for="cf-n">Nom</label><input id="cf-n" placeholder="Ex. : Galettes de riz Marque X"></div>
+  return sheetHead('Aliment perso') + `${s.note ? `<div class="tip">${esc(s.note)}</div>` : ''}<div class="mut small">Recopie l'étiquette, valeurs pour 100 g.</div>
+  <div class="field"><label for="cf-n">Nom</label><input id="cf-n" placeholder="Ex. : Galettes de riz Marque X" value="${esc(s.name || '')}"></div>
   <div class="grid2">${[['k', 'kcal'], ['p', 'Protéines (g)'], ['c', 'Glucides (g)'], ['f', 'Lipides (g)']].map(([k, l]) => `<div class="field"><label for="cf-${k}">${l}</label><input id="cf-${k}" inputmode="decimal"></div>`).join('')}</div>
   <div class="field"><label for="cf-por">Portion habituelle (g, facultatif)</label><input id="cf-por" inputmode="decimal"></div>
   <button class="btn pri full" data-a="saveCustomFood">Enregistrer l'aliment</button>`;
@@ -1349,6 +1356,77 @@ async function shrinkImage(file, max = 1280) {
     return await new Promise(r => c.toBlob(b => r(b || file), 'image/jpeg', 0.85));
   } catch (e) { return file; }
 }
+/* ========== code-barres (Open Food Facts) ========== */
+const ZX_SRC = IS_ARTIFACT ? 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js' : 'vendor/zxing.min.js';
+let zxP = null;
+function loadZX() {
+  if (window.ZXing) return Promise.resolve(window.ZXing);
+  if (!zxP) zxP = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = ZX_SRC; sc.onload = () => window.ZXing ? res(window.ZXing) : rej(new Error('zx')); sc.onerror = () => { zxP = null; rej(new Error('zx')); }; document.head.appendChild(sc); });
+  return zxP;
+}
+const barcodes = () => (Store.get('barcodes') && Store.get('barcodes').map) || {};
+function saveBarcode(code, food) { const map = Object.assign({}, barcodes()); map[code] = food; Store.set('barcodes', { kind: 'barcodes', map }); }
+const bcFood = b => ({ id: 'bc' + b.code, n: b.n, k: b.k, p: b.p, c: b.c, f: b.f, por: b.sq ? [{ l: 'portion', g: b.sq }] : [], cat: 'Code-barres' });
+async function lookupBarcode(code) {
+  const known = barcodes()[code]; if (known) return known;
+  let j = null;
+  try {
+    const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,product_name_fr,generic_name_fr,brands,nutriments,serving_quantity`);
+    if (!r.ok && r.status !== 404) throw new Error('http');
+    j = await r.json();
+  } catch (e) { throw { code: 'net' }; }
+  const p = j && j.product; if (!p) return null;
+  const nu = p.nutriments || {};
+  let k = num(nu['energy-kcal_100g']); if (k == null && num(nu.energy_100g) != null) k = num(nu.energy_100g) / 4.184;
+  const brand = String(p.brands || '').split(',')[0].trim();
+  let n = String(p.product_name_fr || p.product_name || p.generic_name_fr || '').trim() || 'Produit ' + code;
+  if (brand && !n.toLowerCase().includes(brand.toLowerCase())) n += ' · ' + brand;
+  n = n.slice(0, 60);
+  if (k == null) return { code, n, incomplete: true };
+  const food = { code, n, k: r0(k), p: r1(num(nu.proteins_100g) || 0), c: r1(num(nu.carbohydrates_100g) || 0), f: r1(num(nu.fat_100g) || 0), sq: r0(num(p.serving_quantity) || 0) };
+  saveBarcode(code, food);
+  return food;
+}
+const Scan = { el: null, reader: null, busy: false, meal: null };
+function scanStop() {
+  try { Scan.reader && Scan.reader.reset(); } catch (e) {}
+  if (Scan.el) { const v = Scan.el.querySelector('video'); if (v && v.srcObject) { v.srcObject.getTracks().forEach(t => t.stop()); v.srcObject = null; } Scan.el.remove(); }
+  Scan.el = null; Scan.reader = null; Scan.busy = false;
+}
+function scanMsg(t) { const m = Scan.el && Scan.el.querySelector('#scan-msg'); if (m) m.textContent = t; }
+async function scanFound(code) {
+  code = String(code || '').replace(/\D/g, '');
+  if (Scan.busy || code.length < 6) { if (code.length < 6) scanMsg('Code trop court : 8 ou 13 chiffres.'); return; }
+  Scan.busy = true; scanMsg('Code ' + code + ' : recherche…');
+  if (navigator.vibrate) try { navigator.vibrate(60); } catch (e) {}
+  const meal = Scan.meal;
+  try {
+    const b = await lookupBarcode(code);
+    scanStop();
+    if (!b || b.incomplete) { openSheet({ t: 'customFood', code, meal, name: b ? b.n : '', note: b ? 'Produit trouvé mais sans calories. Recopie l\'étiquette une fois, il sera reconnu la prochaine fois.' : 'Produit inconnu. Recopie l\'étiquette une fois, il sera reconnu au prochain scan.' }); return; }
+    const f = bcFood(b);
+    openSheet({ t: 'portion', food: f, meal, g: String((f.por[0] && f.por[0].g) || 100) });
+  } catch (e) { Scan.busy = false; scanMsg('Pas de réseau pour chercher ce produit. Réessaie, ou utilise Aliment perso.'); }
+}
+async function scanOpen(meal) {
+  scanStop(); Scan.meal = meal;
+  const el = document.createElement('div'); el.id = 'scan'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Scanner un code-barres');
+  el.innerHTML = `<video playsinline muted></video><div class="box"></div><div class="bar"><div class="mut small" id="scan-msg">Vise le code-barres du produit.</div><div class="row"><input id="scan-code" inputmode="numeric" placeholder="Ou tape les chiffres du code" autocomplete="off"><button class="btn pri" id="scan-go">OK</button></div><button class="btn full" id="scan-x">Fermer</button></div>`;
+  document.body.appendChild(el); Scan.el = el;
+  el.querySelector('#scan-x').onclick = () => { scanStop(); openSheet({ t: 'addFood', meal, q: '' }); };
+  el.querySelector('#scan-go').onclick = () => scanFound(el.querySelector('#scan-code').value);
+  el.querySelector('#scan-code').onkeydown = e => { if (e.key === 'Enter') scanFound(e.target.value); };
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { scanMsg('Caméra indisponible ici : tape les chiffres sous le code-barres.'); return; }
+  try {
+    const ZX = await loadZX(); if (Scan.el !== el) return;
+    const hints = new Map([[ZX.DecodeHintType.POSSIBLE_FORMATS, [ZX.BarcodeFormat.EAN_13, ZX.BarcodeFormat.EAN_8, ZX.BarcodeFormat.UPC_A, ZX.BarcodeFormat.UPC_E]]]);
+    const reader = new ZX.BrowserMultiFormatReader(hints, 200); Scan.reader = reader;
+    await reader.decodeFromConstraints({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } }, el.querySelector('video'), res => { if (res && Scan.el === el) scanFound(res.getText()); });
+  } catch (e) {
+    if (Scan.el !== el) return;
+    scanMsg(e && e.name === 'NotAllowedError' ? 'Accès caméra refusé. Autorise-le dans Réglages, ou tape les chiffres du code.' : e && e.message === 'zx' ? 'Scanner pas chargé (pas de réseau ?). Tape les chiffres du code.' : 'Caméra indisponible. Tape les chiffres sous le code-barres.');
+  }
+}
 function addItems(dayKey, meal, items) { const d = getDay(dayKey); d.meals[meal] = (d.meals[meal] || []).concat(items); saveDay(d); rememberFoods(items); }
 const sheetDay = () => UI.tab === 'food' ? (UI.nutDay || today()) : today();
 function updActive(fn, soon) { const a = active(); if (!a) return; fn(a); if (soon) Store.setSoon('active', a); else Store.set('active', a); }
@@ -1401,7 +1479,8 @@ const A = {
     } catch (e) { s.err = aiErr(e, 'Pas d\'idées cette fois. Réessaie dans un instant.'); }
     s.busy = false; if (UI.sheet === s) renderSheet();
   },
-  customFood: () => openSheet({ t: 'customFood' }),
+  customFood: () => openSheet({ t: 'customFood', meal: (UI.sheet && UI.sheet.meal) || defaultMeal() }),
+  scan: () => { const meal = (UI.sheet && UI.sheet.meal) || defaultMeal(); closeSheet(); scanOpen(meal); },
   saveCustomFood: () => {
     const n = $('#cf-n').value.trim(); const v = k => num($('#cf-' + k).value) || 0;
     if (!n) { toast('Donne un nom à l\'aliment.'); return; }
@@ -1409,6 +1488,7 @@ const A = {
     const f = { id: 'c' + newId(), n, k: v('k'), p: v('p'), c: v('c'), f: v('f'), por: por ? [{ l: 'portion', g: por }] : [] };
     rememberFoods([{ n, g: por || 100, k: f.k * (por || 100) / 100, p: f.p * (por || 100) / 100, c: f.c * (por || 100) / 100, f: f.f * (por || 100) / 100, per: { k: f.k, p: f.p, c: f.c, f: f.f } }], { por: f.por });
     const m = myFoods().find(x => x.n === n);
+    if (UI.sheet && UI.sheet.code) saveBarcode(UI.sheet.code, { code: UI.sheet.code, n, k: f.k, p: f.p, c: f.c, f: f.f, sq: por || 0 });
     toast('Aliment enregistré dans Mes aliments'); openSheet({ t: 'portion', food: myAsFood(m), meal: (UI.sheet && UI.sheet.meal) || defaultMeal(), g: String(por || 100) });
   },
   // muscu
