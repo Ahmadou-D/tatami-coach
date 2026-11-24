@@ -793,6 +793,18 @@ function goalInfo() {
 function weighInput(def, label) {
   return `<div class="stepper"><button data-a="wStep" data-x="-0.1" aria-label="Moins 100 g">−</button><input id="w-in" inputmode="decimal" value="${fr(def)}" aria-label="Poids en kg"><button data-a="wStep" data-x="0.1" aria-label="Plus 100 g">+</button></div><button class="btn pri full" data-a="saveWeight">${label}</button>`;
 }
+const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+function backupCard() {
+  if (IS_ARTIFACT || !Caps.downloads) return '';
+  const now = Date.now(), DAY = 864e5;
+  if (!lsGet('tc.firstSeen')) lsSet('tc.firstSeen', String(now));
+  const last = +lsGet('tc.lastExport') || 0, first = +lsGet('tc.firstSeen') || now, snooze = +lsGet('tc.exportSnooze') || 0;
+  const due = last ? now - last > 30 * DAY : now - first > 7 * DAY;
+  if (!due || now < snooze) return '';
+  const ago = last ? Math.floor((now - last) / DAY) : 0;
+  return `<div class="card"><span class="lbl">Sauvegarde du mois</span><h3>Exporte tes données</h3><div class="mut small">${last ? `Dernière sauvegarde il y a ${ago} jours.` : 'Pas encore de sauvegarde.'} Tout est sur ce téléphone : enregistre le fichier dans Fichiers ou iCloud Drive pour ne rien perdre.</div><div class="row"><button class="btn pri grow" data-a="export">Exporter maintenant</button><button class="btn" data-a="exportLater">Plus tard</button></div></div>`;
+}
 function weighCard(d) {
   if (new Date().getDay() !== 1) return '';
   const b = body(); if (b.weights.some(w => w.d === d.date)) return '';
@@ -906,7 +918,7 @@ function viewToday() {
   const missed = hadHistory && !validated(y);
   return header('Aujourd\'hui', fmtDay(k)) +
     (missed ? `<div class="card"><h3>Hier n'est pas validé, et c'est réglé.</h3><div class="mut">Rien à rattraper, pas de calories à compenser. On fait juste le minimum d'aujourd'hui.</div></div>` : '') +
-    weighCard(d) + nowCard(d) + planCard(d) + minimumCard(d) + macrosCard(d) + supCard(d) + motivCard(todayMsg(k));
+    weighCard(d) + backupCard() + nowCard(d) + planCard(d) + minimumCard(d) + macrosCard(d) + supCard(d) + motivCard(todayMsg(k));
 }
 
 /* ========== NUTRITION ========== */
@@ -1613,7 +1625,8 @@ const A = {
   saveGoals: () => { const p = profile(); for (const k of ['kcal', 'p', 'c', 'f', 'minProt', 'cat']) { const v = num($('#p-' + k).value); if (v) p[k] = v; } saveProfile(p); toast('Objectifs enregistrés'); render(); },
   weekM: (x, i) => { const p = profile(); p.week = JSON.parse(JSON.stringify(p.week)); p.week[x] = Object.assign({}, p.week[x], { m: i }); saveProfile(p); render(); },
   weekJ: x => { const p = profile(); p.week = JSON.parse(JSON.stringify(p.week)); p.week[x] = Object.assign({}, p.week[x], { jjb: !(p.week[x] || {}).jjb }); saveProfile(p); render(); },
-  export: async () => { if (!Caps.downloads) return; try { await Caps.downloads.save({ filename: `tatami-coach-${today()}.json`, data: JSON.stringify({ app: 'tatami-coach', v: 1, exported: new Date().toISOString(), docs: Store.docs }, null, 1) }); } catch (e) { if (e && e.code !== 'cancelled' && e.code !== 'declined') toast('Export impossible.'); } },
+  export: async () => { if (!Caps.downloads) return; try { await Caps.downloads.save({ filename: `tatami-coach-${today()}.json`, data: JSON.stringify({ app: 'tatami-coach', v: 1, exported: new Date().toISOString(), docs: Store.docs }, null, 1) }); lsSet('tc.lastExport', String(Date.now())); toast('Sauvegarde faite. Prochain rappel dans un mois.'); render(); } catch (e) { if (e && e.code !== 'cancelled' && e.code !== 'declined') toast('Export impossible.'); } },
+  exportLater: () => { lsSet('tc.exportSnooze', String(Date.now() + 3 * 864e5)); render(); },
   import: () => openSheet({ t: 'import' }),
   keySave: () => { const v = ($('#api-key').value || '').trim(); if (!/^sk-ant-/.test(v)) { toast('Ça ne ressemble pas à une clé Anthropic (sk-ant-…).'); return; } try { localStorage.setItem('tc.apikey', v); } catch (e) {} Caps.sample = ApiSample; Caps.imgOk = true; toast('Clé enregistrée'); render(); },
   keyDel: () => { try { localStorage.removeItem('tc.apikey'); } catch (e) {} Caps.sample = null; Caps.imgOk = false; render(); },

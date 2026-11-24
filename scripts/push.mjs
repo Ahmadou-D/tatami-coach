@@ -7,12 +7,13 @@ const { timezone, reminders } = JSON.parse(readFileSync(new URL('../reminders.js
 if (!process.env.PUSH_CONFIG) { console.log('Secret PUSH_CONFIG missing: activate notifications in the app first. Nothing sent.'); process.exit(0); }
 const { sub, pub, priv } = JSON.parse(process.env.PUSH_CONFIG);
 
-const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: timezone, weekday: 'short', hour: '2-digit', hour12: false }).formatToParts(new Date()).map(p => [p.type, p.value]));
+const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: timezone, weekday: 'short', day: 'numeric', hour: '2-digit', hour12: false }).formatToParts(new Date()).map(p => [p.type, p.value]));
 const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(parts.weekday);
 const hour = Number(parts.hour) % 24;
+const date = Number(parts.day);
 const force = process.env.FORCE_TEST === 'true';
 
-const due = force ? [{ title: 'Test Tatami Coach', body: 'Les notifications marchent.' }] : reminders.filter(r => r.days.includes(day) && Number(r.time.split(':')[0]) === hour);
+const due = force ? [{ title: 'Test Tatami Coach', body: 'Les notifications marchent.' }] : reminders.filter(r => (!r.days || r.days.includes(day)) && (!r.dom || r.dom.includes(date)) && Number(r.time.split(':')[0]) === hour);
 if (!due.length) { console.log(`Nothing due (day ${day}, ${hour}h ${timezone}).`); process.exit(0); }
 
 webpush.setVapidDetails('mailto:noreply@example.com', pub, priv);
