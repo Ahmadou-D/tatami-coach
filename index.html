@@ -473,6 +473,40 @@ const MOB_BLOCKS = [
   { n: 'Pigeon côté gauche', sets: 2, s: 60, t: 'Hanche gauche devant, même consigne que le côté droit.' },
 ];
 const PAILS_DAYS = [1, 3, 5];
+/* ========== illustrations de mobilité (SVG intégrés, marchent hors ligne) ========== */
+const MOB_ANIM = (() => { try { return !matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return true; } })();
+function mobFig(name, sub) {
+  const kind = /grenouille/i.test(name) ? 'frog' : /pigeon/i.test(name) ? 'pigeon' : null;
+  if (!kind) return '';
+  const left = /gauche/i.test(name);
+  const A = (attr, vals, dur = 6) => MOB_ANIM ? `<animate attributeName="${attr}" values="${vals}" keyTimes="0;0.4;0.7;1" dur="${dur}s" repeatCount="indefinite"/>` : '';
+  const L = (x1, y1, x2, y2, hi, anim = '') => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${hi ? 'var(--acc)' : 'var(--fg)'}" stroke-width="${hi ? 7 : 6}" stroke-linecap="round">${anim}</line>`;
+  const arrow = (x, y1, y2, label) => `<g opacity="0.95">${MOB_ANIM ? '<animate attributeName="opacity" values="0.35;1;0.35" dur="1.6s" repeatCount="indefinite"/>' : ''}<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2 - Math.sign(y2 - y1) * 6}" stroke="#F2B45C" stroke-width="4" stroke-linecap="round"/><polygon points="${x - 7},${y2 - Math.sign(y2 - y1) * 8} ${x + 7},${y2 - Math.sign(y2 - y1) * 8} ${x},${y2}" fill="#F2B45C"/><text x="${x < 60 ? x - 6 : x + 6}" y="15" text-anchor="${x < 60 ? 'start' : 'end'}" fill="#F2B45C" font-size="13" font-weight="700">${label}</text></g>`;
+  const floor = '<line x1="6" y1="106" x2="194" y2="106" stroke="var(--line)" stroke-width="2"/>';
+  const mirror = g => left ? `<g transform="translate(200,0) scale(-1,1)">${g}</g>` : g;
+  let side, top, over = '';
+  const ax = x => left ? 200 - x : x;
+  if (kind === 'pigeon') {
+    const up = [100, 46], fold = [140, 72], sv = `${up[0]};${fold[0]};${fold[0]};${up[0]}`, svy = `${up[1]};${fold[1]};${fold[1]};${up[1]}`;
+    side = floor + L(95, 86, 58, 101) + L(58, 101, 20, 103) + L(95, 86, 130, 99, 1) + L(130, 99, 104, 102, 1) +
+      `<line x1="95" y1="86" x2="${up[0]}" y2="${up[1]}" stroke="var(--fg)" stroke-width="6" stroke-linecap="round">${A('x2', sv)}${A('y2', svy)}</line>` +
+      `<line x1="${up[0]}" y1="${up[1]}" x2="120" y2="102" stroke="var(--fg)" stroke-width="5" stroke-linecap="round">${A('x1', sv)}${A('y1', svy)}${A('x2', '120;160;160;120')}</line>` +
+      `<circle cx="103" cy="34" r="9" fill="var(--fg)">${A('cx', '103;151;151;103')}${A('cy', '34;66;66;34')}</circle>`;
+    top = L(88, 72, 112, 72) + L(112, 72, 140, 48, 1) + L(140, 48, 80, 54, 1) + L(88, 72, 88, 94) + L(88, 94, 88, 116) + L(100, 72, 100, 36) + L(86, 36, 114, 36) + `<circle cx="100" cy="24" r="9" fill="var(--fg)"/>`;
+    if (sub === 'PAILs') over = arrow(ax(182), 26, 96, 'pousse');
+    if (sub === 'RAILs') over = arrow(ax(182), 96, 26, 'décolle');
+  } else {
+    const hv = '95;80;80;95', hy = '72;80;80;72';
+    side = floor + `<line x1="95" y1="102" x2="95" y2="72" stroke="var(--acc)" stroke-width="7" stroke-linecap="round">${A('x2', hv)}${A('y2', hy)}</line>` + L(95, 102, 66, 103) +
+      `<line x1="95" y1="72" x2="145" y2="74" stroke="var(--fg)" stroke-width="6" stroke-linecap="round">${A('x1', hv)}${A('y1', hy)}</line>` +
+      L(145, 74, 145, 102) + L(145, 102, 178, 102) + `<circle cx="160" cy="62" r="9" fill="var(--fg)"/>`;
+    top = L(90, 72, 110, 72) + L(90, 72, 52, 80, 1) + L(110, 72, 148, 80, 1) + L(52, 80, 52, 112, 1) + L(148, 80, 148, 112, 1) + L(100, 72, 100, 34) + L(86, 34, 114, 34) + L(86, 34, 86, 10) + L(114, 34, 114, 10) + `<circle cx="100" cy="22" r="9" fill="var(--fg)"/>`;
+    if (sub === 'PAILs') over = arrow(ax(30), 26, 98, 'pousse');
+    if (sub === 'RAILs') over = arrow(ax(30), 98, 26, 'décolle');
+  }
+  const svg = (g, lbl) => `<figure style="margin:0;flex:1;min-width:0;background:var(--s2);border-radius:12px;padding:6px 6px 4px"><svg viewBox="0 0 200 120" width="100%" role="img" aria-label="${esc(name)}, ${lbl}">${g}</svg><figcaption class="mut small" style="text-align:center">${lbl}</figcaption></figure>`;
+  return `<div class="row" style="gap:8px;align-items:stretch">${svg(mirror(side) + over, 'De profil')}${svg(mirror(top), 'Vu de dessus')}</div><div class="mut small"><span style="color:var(--acc)">■</span> zone travaillée${kind === 'pigeon' ? ` : jambe ${left ? 'gauche' : 'droite'} devant, tibia en travers` : ' : genoux bien écartés, pieds alignés avec les genoux'}</div>`;
+}
 function mobSteps(pails) {
   const out = [];
   MOB_BLOCKS.forEach((b, bi) => {
@@ -1335,7 +1369,7 @@ function shMobility(s) {
   const started = s.left != null || i > 0;
   return sheetHead('Mobilité du soir') +
   (!started ? `<div class="row sp"><span class="mut small">${Math.round(total / 60)} min au total</span><button class="chip ${s.pails ? 'on' : ''}" data-a="mobPails">${s.pails ? '✓ ' : ''}PAILs/RAILs</button></div>` : '') +
-  `<div class="card hero"><div class="row sp"><span class="lbl">${esc(cur.sub || 'Transition')}</span><span class="mut small num">${i + 1}/${steps.length}</span></div><h2>${esc(cur.n)}</h2><div class="mut">${esc(cur.t)}</div><div class="rest" style="position:static;background:none;border:0;padding:0"><div class="t" id="mob-t">${fmtDur(s.left ?? cur.s)}</div></div><div class="bar"><i id="mob-b" style="width:${done / total * 100}%"></i></div></div>
+  `<div class="card hero"><div class="row sp"><span class="lbl">${esc(cur.sub || 'Transition')}</span><span class="mut small num">${i + 1}/${steps.length}</span></div><h2>${esc(cur.n)}</h2>${(() => { if (!cur.tr) return mobFig(cur.n, cur.sub); const nx = steps.slice(i + 1).find(x => !x.tr); return nx ? `<span class="lbl">Ensuite : ${esc(nx.n)}</span>` + mobFig(nx.n, '') : ''; })()}<div class="mut">${esc(cur.t)}</div><div class="rest" style="position:static;background:none;border:0;padding:0"><div class="t" id="mob-t">${fmtDur(s.left ?? cur.s)}</div></div><div class="bar"><i id="mob-b" style="width:${done / total * 100}%"></i></div></div>
   <div class="list">${MOB_BLOCKS.map(b => `<div class="item"><span class="n" style="${cur.n === b.n ? 'font-weight:600' : ''}">${esc(b.n)}</span><span class="k">${b.sets} × ${b.s} s${s.pails ? ' + PAILs/RAILs' : ''}</span></div>`).join('')}</div>
   <div class="row"><button class="btn pri grow" data-a="mobGo">${s.run ? 'Pause' : (started ? 'Reprendre' : 'Démarrer')}</button><button class="btn" data-a="mobNext">Suivant</button></div><button class="btn ghost full" data-a="mobDone">Marquer comme fait</button>
   <div class="mut small">PAILs/RAILs proposés le lundi, le mercredi et le vendredi. Le reste du temps, la routine simple tous les soirs : c'est la régularité qui assouplit les hanches.</div>`;
