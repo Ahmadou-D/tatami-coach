@@ -1538,7 +1538,7 @@ function shRest(s) { const a = active(); const it = a && a.items[s.ii]; const op
 function shImport(s) { return sheetHead('Importer') + `<div class="mut">Choisis un fichier exporté depuis Tatami Coach. Les éléments importés remplacent ceux qui ont le même identifiant, le reste est gardé.</div>${s.preview ? `<div class="card" style="background:var(--s2)">${s.preview.n} éléments trouvés (${s.preview.w} séances, ${s.preview.d} jours).</div><button class="btn pri full" data-a="importYes">Importer</button>` : `<button class="btn pri full" data-a="importPick">Choisir le fichier</button>`}${s.err ? `<div class="tip" style="border-color:var(--bad)">${esc(s.err)}</div>` : ''}`; }
 
 /* ========== actions ========== */
-function pickFile(accept, cb) { const f = $('#filepick'); f.value = ''; f.accept = accept; f.onchange = () => { const file = f.files && f.files[0]; if (file) cb(file); }; f.click(); }
+function pickFile(accept, cb, multi) { const f = $('#filepick'); f.value = ''; f.accept = accept; f.multiple = !!multi; f.onchange = () => { const fs = [...(f.files || [])]; if (!fs.length) return; if (multi) cb(fs); else cb(fs[0]); }; f.click(); }
 async function shrinkImage(file, max = 1280) {
   try {
     const url = URL.createObjectURL(file); const img = new Image(); img.src = url; await img.decode();
@@ -2221,7 +2221,7 @@ Object.assign(A, {
   },
   jjbTechDel: async () => { const t = Store.get(UI.sheet.id); Store.del(UI.sheet.id); for (const m of (t && t.media) || []) try { Caps.assets && await Caps.assets.delete(m.id); } catch (e) {} closeSheet(); render(); },
   jjbTechSt: x => { const t = Object.assign({}, Store.get(UI.sheet.id)); t.status = x; Store.set(UI.sheet.id, t); renderSheet(); render(); },
-  jjbMediaAdd: x => { if (!Caps.assets) { toast('Photos indisponibles ici.'); return; } pickFile('image/*,video/*', async f => { toast('Ajout…'); try { const m = await jjbUpload(f); if (!m) return; const o = jjbOwner(x); if (!o) return; o.list.push(m); o.save(); if (x.startsWith('tk:')) { const t = Object.assign({}, Store.get(x.slice(3))); if (t.ph) { t.ph = Math.max(0, t.ph - 1); Store.set(x.slice(3), Object.assign(t, { media: o.list })); } } toast(m.type === 'video' ? 'Vidéo ajoutée' : 'Photo ajoutée'); renderSheet(); render(); } catch (e) { toast('Ajout impossible : ' + (e && e.code === 'quota_exceeded' ? 'stockage plein.' : 'réessaie.')); } }); },
+  jjbMediaAdd: x => { if (!Caps.assets) { toast('Photos indisponibles ici.'); return; } pickFile('image/*,video/*', async files => { let n = 0; for (const f of files) { toast(`Ajout ${n + 1}/${files.length}…`); try { const m = await jjbUpload(f); if (!m) continue; const o = jjbOwner(x); if (!o) return; o.list.push(m); o.save(); if (x.startsWith('tk:')) { const t = Object.assign({}, Store.get(x.slice(3))); if (t.ph) Store.set(x.slice(3), Object.assign(t, { ph: Math.max(0, t.ph - 1) })); } n++; } catch (e) { toast('Ajout impossible : ' + (e && e.code === 'quota_exceeded' ? 'stockage plein.' : 'réessaie.')); break; } } if (n) toast(n > 1 ? `${n} fichiers ajoutés` : 'Ajouté'); renderSheet(); render(); }, true); },
   jjbMediaDel: async (x, i) => { const o = jjbOwner(x); if (!o) return; const [m] = o.list.splice(+i, 1); o.save(); try { m && Caps.assets && await Caps.assets.delete(m.id); } catch (e) {} renderSheet(); render(); },
   jjbZoom: x => openSheet({ t: 'jjbZoom', id: x }),
   rtStart: x => { const p = rtPresets().find(z => z.id === x); if (p) rtStart(p); },
