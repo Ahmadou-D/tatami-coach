@@ -1,27 +1,29 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Tatami">
+<meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Tatami">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/icon-180.png"><link rel="icon" href="icons/icon-192.png">
 <style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
 <title>Tatami Coach</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0D1015">
+<meta name="theme-color" content="#F3F1EC">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: one-thumb phone app. Content scrolls, primary actions sit low, a 5-tab bar is pinned to the bottom. Single deliberate dark look. */
+/* Layout: one-thumb phone app. Light "paper" look: warm off-white background, white cards with hairline borders,
+   ink-black primary buttons, one vermillion accent (the tatami red). Dark "ink" blocks for the hero cards. */
 :root{
-  color-scheme:dark;
-  --bg:#0D1015; --s1:#151A21; --s2:#1C222B; --s3:#262E39; --line:#2A323E;
-  --fg:#E9EDF3; --mut:#8D97A8; --dim:#5E6878;
-  --acc:#8FB3FF; --acc-ink:#0B1220;
-  --ok:#5DD39E; --warn:#F2B84B; --bad:#F07C7C;
-  --prot:#F2B84B; --carb:#7DD3C7; --fat:#E79BC0; --kcal:#8FB3FF;
-  --fd:'Archivo','Arial Narrow',system-ui,sans-serif;
-  --fb:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --r:16px; --navh:64px;
+  color-scheme:light;
+  --bg:#F3F1EC; --s1:#FFFFFF; --s2:#F1EEE8; --s3:#E6E2DA; --line:#E4E0D7;
+  --fg:#15171B; --mut:#6A6E76; --dim:#9EA1A8;
+  --acc:#E8552D; --acc-ink:#FFFFFF; --ink:#15171B; --ink-fg:#FFFFFF;
+  --ok:#17935A; --warn:#C98200; --bad:#D14343;
+  --ok-t:#E2F3E9; --warn-t:#FBF0D9; --bad-t:#FBE9E7; --acc-t:#FDE7E0;
+  --prot:#E39A12; --carb:#1E9C8E; --fat:#C4508C; --kcal:#E8552D;
+  --fd:'Bricolage Grotesque','Arial Narrow',system-ui,sans-serif;
+  --fb:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --r:20px; --navh:66px;
 }
 html,body{height:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--fb);font-size:16px;line-height:1.4;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
@@ -34,8 +36,8 @@ textarea{resize:vertical;min-height:80px}
 input::placeholder,textarea::placeholder{color:var(--dim)}
 .num,.tab{font-variant-numeric:tabular-nums}
 h1,h2,h3{font-family:var(--fd);margin:0;text-wrap:balance;letter-spacing:.005em}
-h1{font-size:28px;font-weight:800}
-h2{font-size:20px;font-weight:800}
+h1{font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+h2{font-size:21px;font-weight:800;letter-spacing:-.01em}
 h3{font-size:16px;font-weight:600}
 .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);font-weight:600}
 .mut{color:var(--mut)} .small{font-size:13px}
@@ -46,23 +48,25 @@ h3{font-size:16px;font-weight:600}
 .sync{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);white-space:nowrap}
 .sync i{width:8px;height:8px;border-radius:50%;background:var(--dim)}
 .sync.ok i{background:var(--ok)} .sync.slow i,.sync.local i{background:var(--warn)} .sync.err i{background:var(--bad)}
-.card{background:var(--s1);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
-.card.hero{background:linear-gradient(160deg,#1A2335,#151A21 70%);border:1px solid #24324A}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.hero,.dark{--s1:#15171B;--s2:#24272D;--s3:#33373F;--line:#2C3036;--fg:#FFFFFF;--mut:#A8ACB4;--dim:#767A82;--ok-t:#1D3A2B;--acc-t:#40231A;background:var(--s1);color:var(--fg);border-color:#15171B}
+.card.hero .btn.pri,.dark .btn.pri{background:var(--acc);color:#fff}
 .row{display:flex;align-items:center;gap:10px;min-width:0}
 .row.sp{justify-content:space-between}
 .wrap{flex-wrap:wrap}
 .grow{flex:1;min-width:0}
 .stack{display:flex;flex-direction:column;gap:8px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:14px;background:var(--s3);font-weight:600;font-size:16px}
-.btn.pri{background:var(--acc);color:var(--acc-ink)}
-.btn.ok{background:var(--ok);color:#06140D}
+.btn.pri{background:var(--ink);color:var(--ink-fg)}
+.btn.acc{background:var(--acc);color:#fff}
+.btn.ok{background:var(--ok);color:#fff}
 .btn.ghost{background:transparent;border:1px solid var(--line)}
-.btn.danger{background:transparent;border:1px solid #5a2b2b;color:var(--bad)}
+.btn.danger{background:transparent;border:1px solid #EFC4C0;color:var(--bad)}
 .btn.sm{min-height:38px;padding:0 12px;font-size:14px;border-radius:11px}
 .btn.full{width:100%}
 .btn[disabled]{opacity:.45}
 .chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px;border-radius:999px;background:var(--s2);border:1px solid var(--line);font-size:14px;white-space:nowrap}
-.chip.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.chip.on{background:var(--ink);color:var(--ink-fg);border-color:var(--ink)}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chips.scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
 .chips.scroll::-webkit-scrollbar{display:none}
@@ -75,11 +79,11 @@ h3{font-size:16px;font-weight:600}
 .check{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 12px;border-radius:14px;background:var(--s2);text-align:left;width:100%}
 .check .box{flex:none;width:28px;height:28px;border-radius:9px;border:2px solid var(--dim);display:grid;place-items:center}
 .check.on .box{background:var(--ok);border-color:var(--ok)}
-.check.on .box::after{content:"";width:12px;height:7px;border:3px solid #06140D;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.check.on .box::after{content:"";width:12px;height:7px;border:3px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .check .txt{flex:1;min-width:0}
 .check .txt b{display:block;font-weight:600}
 .check .txt span{font-size:13px;color:var(--mut)}
-.valid{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(93,211,158,.12);color:var(--ok);font-weight:600}
+.valid{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--ok-t);color:var(--ok);font-weight:600}
 .now{display:flex;flex-direction:column;gap:6px}
 .now .big{font-family:var(--fd);font-weight:800;font-size:22px;line-height:1.15}
 .meal{display:flex;flex-direction:column;gap:6px}
@@ -92,28 +96,30 @@ h3{font-size:16px;font-weight:600}
 .empty{color:var(--dim);font-size:14px;padding:4px 0}
 .seg{display:flex;background:var(--s2);border-radius:12px;padding:3px;gap:3px}
 .seg button{flex:1;min-height:38px;border-radius:9px;font-size:14px;color:var(--mut);font-weight:600}
-.seg button.on{background:var(--s3);color:var(--fg)}
+.seg button.on{background:var(--s1);color:var(--fg);box-shadow:0 1px 2px rgba(20,20,20,.12)}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .stat{background:var(--s2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .stat .v{font-family:var(--fd);font-weight:800;font-size:22px;font-variant-numeric:tabular-nums}
 .stat .t{font-size:12px;color:var(--mut)}
 .pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;background:var(--s3);color:var(--mut)}
-.pill.ok{background:rgba(93,211,158,.15);color:var(--ok)} .pill.warn{background:rgba(242,184,75,.15);color:var(--warn)} .pill.acc{background:rgba(143,179,255,.15);color:var(--acc)}
-.motiv{position:relative;border-radius:var(--r);overflow:hidden;min-height:150px;display:flex;align-items:flex-end;background:radial-gradient(120% 90% at 0% 0%,#2B3E66 0%,#1A2130 55%,#151A21 100%)}
+.pill.ok{background:var(--ok-t);color:var(--ok)} .pill.warn{background:var(--warn-t);color:var(--warn)} .pill.acc{background:var(--acc-t);color:var(--acc)}
+.motiv{position:relative;border-radius:var(--r);overflow:hidden;min-height:150px;display:flex;align-items:flex-end;background:var(--ink);color:#fff}
+.motiv::before{content:"";position:absolute;left:18px;top:18px;width:28px;height:4px;border-radius:2px;background:var(--acc)}
 .motiv img,.motiv video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .motiv .q{position:relative;padding:18px;font-family:var(--fd);font-weight:800;font-size:22px;line-height:1.2;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .motiv.media .q{background:linear-gradient(transparent,rgba(0,0,0,.7));width:100%}
 /* nav */
-#nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(13,16,21,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-#nav .in{display:grid;grid-template-columns:repeat(5,1fr);max-width:640px;margin:0 auto;height:var(--navh)}
-#nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:var(--mut);font-weight:500}
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(243,241,236,.93);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+#nav .in{display:grid;grid-template-columns:repeat(6,1fr);max-width:640px;margin:0 auto;height:var(--navh)}
+#nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;color:var(--mut);font-weight:600;letter-spacing:-.01em}
 #nav button svg{width:24px;height:24px}
-#nav button.on{color:var(--acc)}
+#nav button.on{color:var(--fg)}
+#nav button.on svg{color:var(--acc)}
 svg.ic{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 /* sheet */
 #sheet-wrap{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;justify-content:flex-end}
-#sheet-wrap .scrim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+#sheet-wrap .scrim{position:absolute;inset:0;background:rgba(21,23,27,.38)}
 #sheet{position:relative;background:var(--s1);border-radius:22px 22px 0 0;max-height:92%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;max-width:640px;width:100%;margin:0 auto}
 #sheet .grab{width:40px;height:5px;border-radius:9px;background:var(--s3);margin:0 auto 2px}
 .sheet-h{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:-8px;background:var(--s1);padding-block:6px;z-index:2}
@@ -122,7 +128,7 @@ svg.ic{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;strok
 #session{position:fixed;inset:0;z-index:70;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
 #session .in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(140px + env(safe-area-inset-bottom,0px));max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 .s-head{position:sticky;top:0;z-index:3;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:10px}
-.ex{background:var(--s1);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.ex{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
 .ex-h{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .ex-h h3{font-size:17px}
 .last{font-size:13px;color:var(--mut)}
@@ -136,8 +142,8 @@ svg.ic{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;strok
 .set .prev{font-size:13px;color:var(--mut);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .set input{text-align:center;padding:8px 4px;height:42px;font-variant-numeric:tabular-nums}
 .set .ok{width:48px;height:42px;border-radius:11px;background:var(--s3);display:grid;place-items:center}
-.set.done .ok{background:var(--ok);color:#06140D}
-.set.done input{background:rgba(93,211,158,.10);border-color:rgba(93,211,158,.35)}
+.set.done .ok{background:var(--ok);color:#fff}
+.set.done input{background:var(--ok-t);border-color:#A9DABF}
 .rest{position:fixed;left:0;right:0;bottom:0;z-index:75;background:var(--s1);border-top:1px solid var(--line);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .rest .in2{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
 .rest .t{font-family:var(--fd);font-weight:800;font-size:30px;font-variant-numeric:tabular-nums}
@@ -159,7 +165,7 @@ svg.ic{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;strok
 .stepper{display:grid;grid-template-columns:56px minmax(0,1fr) 56px;gap:8px;align-items:center}
 .stepper input{text-align:center;font-family:var(--fd);font-weight:800;font-size:26px;height:56px}
 .stepper button{height:56px;border-radius:14px;background:var(--s3);font-size:24px;font-weight:600}
-.confirm{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:12px;background:rgba(240,124,124,.08);border:1px solid #5a2b2b}
+.confirm{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:12px;background:var(--bad-t);border:1px solid #EFC4C0}
 .tip{font-size:14px;color:var(--mut);border-left:3px solid var(--acc);padding-left:10px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 #scan{position:fixed;inset:0;z-index:120;background:#000;display:flex;flex-direction:column}
@@ -169,6 +175,84 @@ svg.ic{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;strok
 #scan .bar .row{display:flex;gap:8px}#scan .bar input{flex:1}
 @keyframes restflash{0%,100%{box-shadow:inset 0 0 0 0 transparent}50%{box-shadow:inset 0 0 0 9px var(--acc)}}
 #session.flash{animation:restflash .6s ease-in-out 3}
+.daynav{display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:6px}
+.daynav .grow{text-align:center;display:flex;flex-direction:column;align-items:center;line-height:1.2}
+.daynav b{font-family:var(--fd);font-weight:800;font-size:17px;text-transform:capitalize}
+.daynav .x[disabled]{opacity:.35}
+.link{color:var(--acc);font-size:13px;font-weight:600}
+.btn.add{background:var(--acc-t);color:var(--acc)}
+.rmeal{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border-radius:14px;background:var(--s2)}
+.rmeal .n{flex:1;min-width:0}.rmeal .n b{display:block;font-size:14px}.rmeal .n span{display:block;font-size:13px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rmeal .k{font-size:13px;color:var(--mut);white-space:nowrap}
+/* JJB */
+.jhero{border-radius:24px;padding:20px 18px;display:flex;flex-direction:column;gap:12px;background:var(--s1);color:var(--fg);position:relative;overflow:hidden}
+.jhero>.row{position:relative;z-index:1}
+.jhero::after{content:"";position:absolute;right:-36px;top:-36px;width:140px;height:140px;border:18px solid var(--acc);border-radius:50%;opacity:.9}
+.jhero h1{font-size:44px;position:relative;z-index:1}
+.jstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;position:relative;z-index:1}
+.jstats div{background:var(--s2);border-radius:14px;padding:10px}
+.jstats b{display:block;font-family:var(--fd);font-weight:800;font-size:24px}
+.jstats span{font-size:12px;color:var(--mut);line-height:1.2;display:block}
+.seg.sticky{position:sticky;top:calc(env(safe-area-inset-top,0px) + 4px);z-index:5;background:var(--s3)}
+.jtheme h3{font-size:17px}
+.jscore{font-family:var(--fd);font-weight:800;font-size:26px;white-space:nowrap}
+.jscore small{font-size:14px;color:var(--mut);font-weight:600}
+.jmedia{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.jm{position:relative;border-radius:12px;overflow:hidden;background:var(--s2);aspect-ratio:4/3}
+.jm img,.jm video{width:100%;height:100%;object-fit:cover;display:block}
+.jdel{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:18px;line-height:1}
+.jnote{display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:1.5}
+.jnote p{margin:0}
+.jnote h4{margin:10px 0 0;font-family:var(--fd);font-size:16px;font-weight:800}
+.jnote a,.card a{color:var(--acc);word-break:break-all}
+.jph{font-size:12px;color:var(--dim);border:1px dashed var(--line);border-radius:10px;padding:6px 10px;align-self:flex-start}
+a.chip{text-decoration:none;color:var(--fg)}
+details summary{cursor:pointer;list-style:none}
+details summary::-webkit-details-marker{display:none}
+.rtp{flex-direction:row;align-items:center;gap:12px}
+.rtp .dot{width:10px;height:10px;border-radius:50%;flex:none}
+.rtplay{width:52px;height:52px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center;flex:none}
+.sw{display:flex;align-items:center;gap:12px;padding:10px 0;width:100%}
+.tg{width:50px;height:30px;border-radius:20px;background:var(--s3);position:relative;flex:none;transition:background .2s}
+.tg::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .2s}
+.tg.on{background:var(--ok)}.tg.on::after{transform:translateX(20px)}
+.rtf{display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:14px;padding:8px 8px 8px 12px}
+.rtf .cb{width:4px;align-self:stretch;border-radius:4px;flex:none}
+.rtstep{display:flex;align-items:center;gap:4px}
+.rtstep button{width:44px;height:44px;border-radius:12px;background:var(--s1);border:1px solid var(--line);font-size:22px;touch-action:manipulation}
+.rtstep .v{min-width:64px;text-align:center;font-family:var(--fd);font-weight:800;font-size:20px}
+.rtcol{width:34px;height:34px;border-radius:50%;border:3px solid transparent}
+.rtcol.on{border-color:var(--fg)}
+.rttl{display:flex;height:10px;border-radius:6px;overflow:hidden;gap:2px}
+.rttl i{display:block;height:100%}
+#rt-run{position:fixed;inset:0;background:var(--phase,#C98200);color:#fff;display:flex;flex-direction:column;z-index:110;transition:background .35s;font-family:var(--fb);-webkit-user-select:none;user-select:none}
+#rt-run[hidden]{display:none}
+#rt-run::after{content:"";position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#rt-run.flash::after{animation:rtfl .5s ease-out 3}
+@keyframes rtfl{0%{opacity:.75}100%{opacity:0}}
+#rt-run .rtop{padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 0;display:flex;align-items:center;gap:10px}
+#rt-run .rtop .nm{flex:1;font-weight:600;font-size:15px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+#rt-run .rib{width:44px;height:44px;border-radius:14px;background:rgba(0,0,0,.18);display:grid;place-items:center;flex:none}
+#rt-run .rmid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 12px;min-height:0}
+#rt-run .phase{font-family:var(--fd);font-weight:800;font-size:clamp(28px,8vw,46px);letter-spacing:.04em;text-transform:uppercase}
+#rt-run .clock{font-family:var(--fd);font-weight:800;font-size:clamp(96px,31vw,220px);line-height:.95;font-variant-numeric:tabular-nums;letter-spacing:-.03em;margin:6px 0 10px}
+#rt-run .counts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#rt-run .rpill{background:rgba(0,0,0,.2);border-radius:999px;padding:8px 16px;font-weight:600;font-size:clamp(16px,4.6vw,20px)}
+#rt-run .rpill small{opacity:.75;font-weight:500}
+#rt-run .next{margin-top:16px;opacity:.85;font-size:15px}
+#rt-run .pbar{height:8px;margin:0 16px;background:rgba(0,0,0,.22);border-radius:6px;overflow:hidden}
+#rt-run .pbar i{display:block;height:100%;background:rgba(255,255,255,.9);width:0}
+#rt-run .rinfo{display:flex;justify-content:space-between;padding:8px 18px 0;font-size:13.5px;opacity:.85;font-variant-numeric:tabular-nums}
+#rt-run .rctl{display:flex;align-items:center;justify-content:center;gap:22px;padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 22px)}
+#rt-run .rctl button{width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.2);display:grid;place-items:center;color:#fff}
+#rt-run .rctl .big{width:92px;height:92px;background:#fff;color:#111}
+#rt-run.paused .clock{animation:rtblink 1.2s steps(2,start) infinite}
+@keyframes rtblink{to{opacity:.35}}
+#rt-run .done-ttl{font-family:var(--fd);font-weight:800;font-size:48px}
+#rt-run .rbtn{margin-top:18px;background:#fff;color:#111;border-radius:14px;padding:14px 20px;font-weight:700}
+#rt-run .rconf{margin-top:16px;background:rgba(0,0,0,.35);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+#rt-run .rconf .rbtn{margin:0}
+@media (orientation:landscape) and (max-height:500px){#rt-run .clock{font-size:min(34vh,26vw);margin:0}#rt-run .next{display:none}#rt-run .rctl{padding-top:6px}}
 </style>
 
 <div id="view" aria-live="polite"></div>
@@ -200,6 +284,8 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 /* ========== icônes ========== */
 const IC = {
+  belt: '<svg class="ic" viewBox="0 0 24 24"><path d="M3 10h18v4H3z"/><path d="M10 10l-3 10M14 10l3 10"/><rect x="9.5" y="9" width="5" height="6" rx="1"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>',
   barcode: '<svg class="ic" viewBox="0 0 24 24" width="20" height="20"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14"/></svg>',
   today: '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   food: '<svg class="ic" viewBox="0 0 24 24"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10"/><path d="M17 21V3c-2 1-3 4-3 7s1 4 3 4"/></svg>',
@@ -851,8 +937,8 @@ function weighCard(d) {
 
 /* ========== état de l'interface ========== */
 const UI = { tab: 'today', navDay: null, nutDay: null, gym: 'routines', bodyTab: 'poids', measure: 'taille', range: 180, sheet: null };
-try { const s = JSON.parse(localStorage.getItem('tc.ui') || '{}'); if (s.tab) UI.tab = s.tab; } catch (e) {}
-const saveUI = () => { try { localStorage.setItem('tc.ui', JSON.stringify({ tab: UI.tab })); } catch (e) {} };
+try { const s = JSON.parse(localStorage.getItem('tc.ui') || '{}'); if (s.tab) UI.tab = s.tab; if (s.jjbTab) UI.jjbTab = s.jjbTab; } catch (e) {}
+const saveUI = () => { try { localStorage.setItem('tc.ui', JSON.stringify({ tab: UI.tab, jjbTab: UI.jjbTab })); } catch (e) {} };
 
 let renderQueued = false, renderDirty = false;
 function scheduleRender() {
@@ -866,14 +952,14 @@ function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = fal
 function render() {
   renderNav();
   const v = $('#view');
-  const fn = { today: viewToday, food: viewFood, gym: viewGym, body: viewBody, more: viewMore }[UI.tab] || viewToday;
+  const fn = { today: viewToday, food: viewFood, gym: viewGym, jjb: viewJJB, body: viewBody, more: viewMore }[UI.tab] || viewToday;
   v.innerHTML = fn();
   if (UI.sheet) renderSheet();
   renderSession();
   hydrateBlobs();
 }
 function renderNav() {
-  const tabs = [['today', 'Aujourd\'hui', IC.today], ['food', 'Nutrition', IC.food], ['gym', 'Muscu', IC.gym], ['body', 'Corps', IC.body], ['more', 'Motivation', IC.more]];
+  const tabs = [['today', 'Aujourd\'hui', IC.today], ['food', 'Nutrition', IC.food], ['gym', 'Muscu', IC.gym], ['jjb', 'JJB', IC.belt], ['body', 'Corps', IC.body], ['more', 'Motivation', IC.more]];
   $('#navin').innerHTML = tabs.map(([k, l, ic]) => `<button data-a="tab" data-x="${k}" class="${UI.tab === k ? 'on' : ''}" aria-current="${UI.tab === k ? 'page' : 'false'}">${ic}<span>${l}</span></button>`).join('');
 }
 const header = (title, sub) => `<div class="top"><div class="grow"><div class="sub">${esc(sub || '')}</div><h1>${esc(title)}</h1></div><span id="syncdot" class="sync ${Store.state}"><i></i>${SYNC_TXT[Store.state]}</span></div>`;
@@ -949,11 +1035,35 @@ function motivCard(it, big) {
   const media = it.type === 'image' && url ? `<img src="${esc(url)}" data-blob="${esc(it.asset)}" alt="">` : it.type === 'video' && url ? `<video src="${esc(url)}" data-blob="${esc(it.asset)}" muted loop playsinline autoplay></video>` : '';
   return `<div class="motiv ${media ? 'media' : ''}" ${big ? 'style="min-height:220px"' : ''}>${media}<div class="q">${esc(it.text || '')}</div></div>`;
 }
+function dayNav(k, act) {
+  const isToday = k === today();
+  const lbl = isToday ? 'Aujourd\'hui' : k === addDays(today(), -1) ? 'Hier' : fmtDay(k);
+  return `<div class="daynav"><button class="x" data-a="${act}" data-x="-1" aria-label="Jour précédent">${IC.left}</button><div class="grow"><b>${esc(lbl)}</b>${isToday ? '' : `<button class="link" data-a="${act}" data-x="0">Revenir à aujourd'hui</button>`}</div><button class="x" data-a="${act}" data-x="1" aria-label="Jour suivant" ${isToday ? 'disabled' : ''}>${IC.right}</button></div>`;
+}
+function pastDayView(k) {
+  const d = getDay(k), t = dayTotals(d), p = profile(), m = minState(d), ok = validated(d);
+  const ws = workouts().filter(w => w.date === k);
+  const wt = body().weights.find(w => w.d === k);
+  const mm = (v, goal, lbl, col) => `<div class="m"><span class="v">${r0(v)}</span><span class="t">/ ${goal} ${lbl}</span><div class="bar"><i style="width:${clamp(v / goal * 100, 0, 100)}%;background:${col}"></i></div></div>`;
+  const tick = (on, title, sub) => `<div class="check ${on ? 'on' : ''}" style="cursor:default"><span class="box"></span><span class="txt"><b>${esc(title)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}</span></div>`;
+  const acts = ws.map(w => `<div class="item"><span class="n"><b>${esc(w.name)}</b> <span class="mut small">${w.items.length} exos · ${r0(w.vol)} kg soulevés</span></span><span class="k">${fmtDur(((w.end || w.start) - w.start) / 1000)}</span></div>`)
+    .concat(d.jjb ? [`<div class="item"><span class="n"><b>JJB</b> <span class="mut small">entraînement</span></span></div>`] : [])
+    .concat(d.mob ? [`<div class="item"><span class="n"><b>Mobilité du soir</b></span></div>`] : []);
+  return header(k === addDays(today(), -1) ? 'Hier' : 'Ce jour-là', fmtDay(k)) + dayNav(k, 'todayDay') +
+  `<div class="card ${ok ? 'dark' : ''}"><div class="row sp"><h2>${ok ? 'Journée validée' : 'Minimum pas complet'}</h2>${wt ? `<span class="pill">${fr(wt.kg)} kg</span>` : ''}</div>
+   <div class="stack">${tick(m.crea, 'Créatine')}${tick(m.prot, `Au moins ${p.minProt} g de protéines`, `${r0(t.p)} g notés`)}${tick(m.move, 'Bouger')}</div></div>
+  <div class="card"><div class="row sp"><h2>Nutrition</h2><button class="btn sm ghost" data-a="openNutDay" data-x="${k}">Modifier</button></div>
+   <div class="macro">${mm(t.k, p.kcal, 'kcal', 'var(--kcal)')}${mm(t.p, p.p, 'g prot.', 'var(--prot)')}${mm(t.c, p.c, 'g gluc.', 'var(--carb)')}${mm(t.f, p.f, 'g lip.', 'var(--fat)')}</div>
+   <div class="list">${MEALS.map(([mk, l]) => { const its = d.meals[mk] || []; const su = sumItems(its); return `<div class="item"><span class="n"><b>${l}</b> <span class="mut small">${its.length ? its.map(i => esc(i.n)).join(', ') : 'rien de noté'}</span></span><span class="k">${its.length ? r0(su.k) + ' kcal' : ''}</span></div>`; }).join('')}</div></div>
+  <div class="card"><h2>Activités</h2>${acts.length ? `<div class="list">${acts.join('')}</div>` : '<div class="empty">Repos ce jour-là.</div>'}</div>
+  <div class="card"><h3>Compléments</h3><div class="chips">${[['crea', 'Créatine'], ['vitd', 'Vitamine D'], ['whey', 'Whey']].map(([x, l]) => `<span class="chip ${d.sup && d.sup[x] ? 'on' : ''}">${d.sup && d.sup[x] ? '✓ ' : ''}${l}</span>`).join('')}</div></div>`;
+}
 function viewToday() {
+  if (UI.todayDay && UI.todayDay < today()) return pastDayView(UI.todayDay);
   const k = today(), d = getDay(k), y = getDay(addDays(k, -1));
   const hadHistory = Object.keys(Store.docs).some(id => id.startsWith('day-') && id < 'day-' + k);
   const missed = hadHistory && !validated(y);
-  return header('Aujourd\'hui', fmtDay(k)) +
+  return header('Aujourd\'hui', fmtDay(k)) + dayNav(k, 'todayDay') +
     (missed ? `<div class="card"><h3>Hier n'est pas validé, et c'est réglé.</h3><div class="mut">Rien à rattraper, pas de calories à compenser. On fait juste le minimum d'aujourd'hui.</div></div>` : '') +
     weighCard(d) + backupCard() + nowCard(d) + planCard(d) + minimumCard(d) + macrosCard(d) + supCard(d) + motivCard(todayMsg(k));
 }
@@ -973,7 +1083,7 @@ function viewFood() {
     const yd = getDay(addDays(k, -1)).meals[mk] || [];
     return `<div class="card meal"><div class="meal-h"><h3>${ml}</h3><span class="mut small num">${its.length ? `${r0(s.k)} kcal · ${r0(s.p)} g P` : ''}</span></div>
     <div class="list">${its.length ? its.map((it, i) => `<button class="item" data-a="editItem" data-x="${mk}" data-i="${i}"><span class="n">${esc(it.n)}</span><span class="k">${r0(it.g)} g · ${r0(it.k)} kcal · ${r1(it.p)} P</span></button>`).join('') : '<div class="empty">Rien de noté.</div>'}</div>
-    <div class="row"><button class="btn sm pri grow" data-a="addFood" data-x="${mk}">${IC.plus} Ajouter</button>${yd.length ? `<button class="btn sm grow" data-a="likeYesterday" data-x="${mk}">Comme hier (${yd.length})</button>` : ''}</div></div>`;
+    <div class="row"><button class="btn sm add grow" data-a="addFood" data-x="${mk}">${IC.plus} Ajouter</button>${yd.length ? `<button class="btn sm grow" data-a="likeYesterday" data-x="${mk}">Comme hier (${yd.length})</button>` : ''}</div></div>`;
   }).join('') +
   `<div class="mut small">Valeurs moyennes de référence pour 100 g, sur les ordres de grandeur de la table Ciqual. Les plats préparés et les estimations par photo sont des approximations.</div>`;
 }
@@ -1260,7 +1370,7 @@ function renderSheet() {
   const s = UI.sheet; if (!s) return;
   const w = $('#sheet-wrap'), el = $('#sheet');
   const ae = document.activeElement; const focusId = ae && ae.id && el.contains(ae) ? ae.id : null; const caret = focusId && ae.selectionStart != null ? ae.selectionStart : null; const sc = el.scrollTop;
-  const fn = { addFood: shAddFood, portion: shPortion, editItem: shEditItem, estimate: shEstimate, ideas: shIdeas, customFood: shCustomFood, pickEx: shPickEx, routine: shRoutine, workout: shWorkout, summary: shSummary, mobility: shMobility, planAdd: shPlanAdd, goal: shGoal, photo: shPhoto, rest: shRest, import: shImport }[s.t];
+  const fn = { addFood: shAddFood, portion: shPortion, editItem: shEditItem, estimate: shEstimate, ideas: shIdeas, customFood: shCustomFood, pickEx: shPickEx, routine: shRoutine, workout: shWorkout, summary: shSummary, mobility: shMobility, planAdd: shPlanAdd, goal: shGoal, photo: shPhoto, rest: shRest, import: shImport }[s.t] || XSHEETS[s.t];
   if (!fn) return;
   el.innerHTML = fn(s);
   w.hidden = false;
@@ -1275,13 +1385,28 @@ function shAddFood(s) {
   const mine = myFoods(); const nMine = mine.length;
   const sorted = ft === 'freq' ? mine.slice().sort((a, b) => (b.uses || 0) - (a.uses || 0) || (b.last || 0) - (a.last || 0)) : mine;
   const rec = !s.q ? sorted.slice(0, s.all ? 400 : 15) : [];
+  const rm = !s.q ? recentMeals(s.meal) : [];
   return sheetHead('Ajouter un aliment') + mealChips(s.meal) +
+  (rm.length ? `<span class="lbl">Repas des 5 derniers jours</span><div class="stack">${rm.map(r => `<button class="rmeal" data-a="addRecentMeal" data-x="${r.k}" data-i="${r.m}"><span class="n"><b>${esc(r.lbl)}</b><span>${esc(r.items.map(i => i.n).join(', '))}</span></span><span class="k">${r0(r.tot.k)} kcal</span>${IC.plus}</button>`).join('')}</div>` : '') +
   `<button class="btn full" data-a="scan">${IC.barcode} Scanner un code-barres</button>
   <input id="food-q" type="search" placeholder="Rechercher : poulet, riz, skyr…" value="${esc(s.q || '')}" autocomplete="off" data-in="foodq">
   ${s.q ? `<div class="list">${res.map(f => `<button class="item" data-a="pickFood" data-x="${esc(f.id)}"><span class="n">${esc(f.n)}<br><span class="mut small">${esc(f.cat || '')}</span></span><span class="k">${r0(f.k)} kcal · ${r1(f.p)} P /100 g</span></button>`).join('') || `<div class="empty">Rien trouvé. Essaie un autre mot, ou utilise l'estimation par description.</div>`}</div>` :
   `${rec.length ? `<div class="seg" role="tablist">${[['rec', 'Récents'], ['freq', 'Fréquents']].map(([k, l]) => `<button data-a="foodTab" data-x="${k}" class="${ft === k ? 'on' : ''}" role="tab" aria-selected="${ft === k}">${l}</button>`).join('')}</div><div class="list">${rec.map(f => `<button class="item" data-a="pickFood" data-x="${esc(f.id)}"><span class="n">${esc(f.n)}${ft === 'freq' && f.uses ? `<br><span class="mut small">${f.uses} fois</span>` : ''}</span><span class="k">${r0(f.g)} g · ${r0(f.per.k * (f.g || 100) / 100)} kcal</span></button>`).join('')}</div>${nMine > 15 ? `<button class="btn ghost full sm" data-a="allMine">${s.all ? 'Voir moins' : `Tout voir (${nMine})`}</button>` : ''}` : `<div class="tip">Tout ce que tu notes est gardé ici pour toujours, avec ta dernière quantité. Plus besoin de le rechercher.</div>`}
   <span class="lbl">Raccourcis</span><div class="chips">${['Whey (poudre)', 'Skyr nature', 'Œuf entier', 'Blanc de poulet cuit', 'Riz blanc cuit', 'Pâtes cuites', 'Banane', 'Steak haché 5 % cuit'].map(n => { const f = FOODS.find(x => x.n === n); return f ? `<button class="chip" data-a="pickFood" data-x="${f.id}">${esc(n)}</button>` : ''; }).join('')}</div>`}
   <div class="grid2"><button class="btn sm" data-a="estimate">${IC.cam} Photo / description</button><button class="btn sm" data-a="customFood">${IC.plus} Aliment perso</button></div>`;
+}
+function recentMeals(meal) {
+  const out = [], seen = new Set(), cur = sheetDay();
+  for (let i = 1; i <= 5; i++) {
+    const k = addDays(cur, -i), d = getDay(k);
+    for (const [m, ml] of MEALS) {
+      const its = d.meals[m] || []; if (!its.length) continue;
+      const sig = its.map(x => x.n + x.g).sort().join('|'); if (seen.has(sig)) continue; seen.add(sig);
+      const dt = parseKey(k);
+      out.push({ k, m, items: its, tot: sumItems(its), lbl: `${i === 1 ? 'Hier' : (w => w[0].toUpperCase() + w.slice(1))(dt.toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', ''))} ${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')} · ${ml}`, same: m === meal });
+    }
+  }
+  return out.sort((a, b) => (b.same - a.same) || (b.k > a.k ? 1 : b.k < a.k ? -1 : 0)).slice(0, 8);
 }
 function findFood(id) { const m = myFoods().find(f => f.id === id); if (m) return myAsFood(m); return FOODS.find(f => f.id === id); }
 function shPortion(s) {
@@ -1499,7 +1624,9 @@ const sheetDay = () => UI.tab === 'food' ? (UI.nutDay || today()) : today();
 function updActive(fn, soon) { const a = active(); if (!a) return; fn(a); if (soon) Store.setSoon('active', a); else Store.set('active', a); }
 
 const A = {
-  tab: x => { UI.tab = x; UI.nutDay = null; saveUI(); window.scrollTo(0, 0); render(); },
+  tab: x => { UI.tab = x; UI.nutDay = null; UI.todayDay = null; saveUI(); window.scrollTo(0, 0); render(); },
+  todayDay: x => { const k = UI.todayDay || today(); const n = +x === 0 ? today() : addDays(k, +x); if (n > today()) return; UI.todayDay = n === today() ? null : n; window.scrollTo(0, 0); render(); },
+  openNutDay: x => { UI.tab = 'food'; UI.todayDay = null; UI.nutDay = x === today() ? null : x; window.scrollTo(0, 0); render(); },
   closeSheet: () => { closeSheet(); render(); },
   sheetMeal: x => { UI.sheet.meal = x; renderSheet(); },
   sup: x => { const d = getDay(today()); d.sup = d.sup || {}; d.sup[x] = !d.sup[x]; if (x === 'whey' && d.sup.whey) { const f = FOODS.find(f => f.n === 'Whey (poudre)'); const has = Object.values(d.meals).flat().some(i => i.n === f.n); if (!has) { d.meals[defaultMeal()].push(itemFrom(f, 30)); toast('Whey ajoutée au journal (30 g, 23 g de protéines).'); } } saveDay(d); render(); },
@@ -1588,6 +1715,7 @@ const A = {
     if (needKg) { const el = document.getElementById(needKg); if (el) el.focus(); return false; }
   },
   doneAll: x => { const a = active(); if (!a) return; const it = a.items[+x]; for (let i = 0; i < it.sets.length; i++) { if (!active().items[+x].sets[i].done && A.doneSet(x, String(i)) === false) break; } },
+  addRecentMeal: (x, i) => { const its = (getDay(x).meals[i] || []).map(it => Object.assign({}, it)); if (!its.length) return; const meal = UI.sheet.meal; addItems(sheetDay(), meal, its); toast(`${its.length} aliment${its.length > 1 ? 's' : ''} ajouté${its.length > 1 ? 's' : ''} au ${MEALS.find(m => m[0] === meal)[1].toLowerCase()}`); closeSheet(); render(); },
   foodTab: x => { UI.foodTab = x; UI.sheet.all = false; renderSheet(); },
   allMine: () => { UI.sheet.all = !UI.sheet.all; renderSheet(); },
   forgetFood: x => { Store.set('myfoods', { kind: 'myfoods', list: myFoods().filter(f => f.id !== x) }); toast('Retiré de Mes aliments'); openSheet({ t: 'addFood', meal: UI.sheet.meal, q: '' }); },
@@ -1703,6 +1831,410 @@ const A = {
   importYes: () => { const s = UI.sheet; for (const id of s.ids) Store.set(id, s.data[id]); closeSheet(); toast(`${s.ids.length} éléments importés`); render(); },
 };
 
+/* ========== ESPACE JJB : timer, thèmes, techniques ========== */
+const JJB_SEED = {"fut": [{"n": "Dlr profonde grip manche", "links": []}, {"n": "Kimura système side +dlr to stack + mussolinilock + waiter octopus backtake + situp wrestle up mica galvao", "links": []}, {"n": "Choibar et shoolder crunch mica galvao", "links": []}, {"n": "Dlr cole abate De La Riva with Underhook Lapel (Free class) by Cole Abate", "links": []}, {"n": "dlr profonde The Deep De La Riva Guard by Nicholas Meregali - Vol 1", "links": []}, {"n": "smash pass bjj", "links": []}, {"n": "Gordon ryan inside camping", "links": []}, {"n": "Outside camping lachlan giles", "links": []}, {"n": "中英双语Gordon Ryan Systematically Attacking the Guard Body Lock Study 身体锁", "links": ["https://b23.tv/0vI1Erq"]}, {"n": "Outside passing", "links": []}, {"n": "Guillotine Gordon ryan + high risk guillotine", "links": []}, {"n": "Kimura trap", "links": []}, {"n": "Darces From Everywhere - Kade & Tye Ruotolo", "links": ["https://b23.tv/rzgXPbA"]}, {"n": "False reap jawrovski", "links": []}, {"n": "Cle de talons", "links": []}, {"n": "Z guard", "links": []}, {"n": "Systematically Attacking From Half Guard By Gordon Ryan", "links": []}, {"n": "Dogfight", "links": ["https://youtu.be/p4zRBQwkmn4?is=HaEMRWqu-9-7bciK"]}, {"n": "Danny Maira And Nick Salles The Arm Saddle", "links": ["https://b23.tv/qLd4FYy"]}, {"n": "Mount", "links": []}, {"n": "Side control", "links": []}, {"n": "Back", "links": []}, {"n": "Anaconda rafa mendes", "links": []}, {"n": "The Berimbolo System Part 1: The Foundation By Mikey Musumeci", "links": []}, {"n": "Choibar By Yongwon Choi", "links": []}, {"n": "Master The Move: The Shoulder Crunch Series By John Danaher", "links": []}], "enc": [{"n": "Backtake (Tainan Dalpra)", "cat": "Dos", "body": "Back take : 泰楠拿背 (vidéo dans les liens)\nTortue :\n1/ prendre le dos en sauttant par dessus: mettre du poid sur son epaule droite\n[photo]\non tombe par terre comme un backstep\n[photo]\non envoie pas juste les jambes de l'autre cote mais leve les hanches on le fait rouler avec le genou de l'autre cote et on met les crochets\n[photo]\n2/ quand il est en tortue qu'il ferme la postiotion on prend le col du dos et le col opposé\n[photo]\non le fait tomber sur ces hanches et on maintient bien la position\n[photo]\nlorsqu'il va vouloir partir on met le crochet d'en dessous puis le second\n3/ lorsque l'on peut mettre le genou\n[photo]\navec l'autre jambe je prend un crochet sur ces chevilles une sorte de crochet dlr\n[photo]\non leve les hanches et on pousse son crochet de sorte a ce que la jambe passe au dessus de on crochet\n[photo]\nsoit on me direct l'autre crochet soit il roule on suit et on met le crochet\ncrab ride\n1/ backtake : les chevilles bien au niveau des genoux et on met une pression\ngrip ceinture et pants cheville une fois qu'il est tombe sur nous le grip sur le ceinture attrape lcol a 'arriere de sa tete et grip la cheville attrape la ceinture\non ramene sa tete vers le bas et on shoot nos crochets\non n'essaye pas de mettre les 2 crochets en meme temps sinon on perd la pression !\non tire son cole d'un cote et on met le crochet et la ceinture de securite puis l'autre crochet\n2/ leg drag : meme grips : ceinture et pants cheville\non sort nos hanches et on ferme une sorte de x sur la jambe de l'adversaire\n[photo]\non le fait tomber de l'autre cote\n[photo]\non inverse notre x et on se met bien sur l'epaule droite\n[photo]\non kick sa jambe et on met ses hanches de l'autre cote on prend le col et on fini\nsoumissions\n1/ cross collar : avoir un bon grip avec le pouce bien enfoncé est plus important que d'avoir un grip haut\non se passe du lapel avec l'autre main si on est pas assez sur la gorgee on met les 2 main sur le meme col on leve nos deux mains a hauteur de la gorge et je tend le lapel avec ma main du dessous\non desaxe et on recupere l'autre col\non croise pzs juste les lapel on pose le pied droit et on leve les hanches\n2/ rnc : pour etrangler on rapproche les coudes et les mets vers le bas", "links": ["https://b23.tv/S1Fgnmi"], "ph": 13}, {"n": "Camping outside (Gordon Ryan)", "cat": "Passages", "body": "Orienter l’adversaire\nMain droite hanche gauche genoux\nPosition tripod avec la tete colle sur la poitrine pour eviter recompo lasso\nSe mettre a 90 degré pour qu’il puisse pousser sur le cote pas vers l’arrière sinon il peut recomposer\nMettre la pression et patienter pour passage ou meilleur position\nSi il attrape ma jambe avec sa jambe coller au sol possibilité de high step pire des cas chest to chest\nBon setup avec toreando et bon finish avc duck under", "links": [], "ph": 0}, {"n": "Chest to chest (Nicholas Meregali)", "cat": "Passages", "body": "Lorsqu’on ai en z guard aplatir ses hanches de l’autre cote les hanches et se concentrer dans un 1er temps sur le contrôle du bas du corp car au debut il a ses mains en frame APPLATIR cad pas essayer de passer de force le knee shield on met la main droite sur sa hanche position camping on se met sur la pointe des pieds et on essaye d’orienter ses hanches de l’autre cote EN MARCHANT VERS LA DROITE . Si on reste bloqué sur le knee shield malgre tt ça rester en camping puis tendre main droite pr qu’il puisse plus mettre knee shield. DILLEME KNEECUT lorsqu’il essayera de remettre le knee shield\nUne fois qu’on contrôle le bas du corps lorsqu’on met l’underhook peut importe tripod ou crossface le  plus important et de faire en sorte que ses épaules soient colle au sol meme si il repousse avec ses frames main et qu’on a pas d’underhook on se concentre sur applatir ses hanches et ses epaules\nPour battre ses derniers frames bras on camp et on joue avec la direction de nos mains et notre tete: passer entre ses bras, pousser, tirer, glisser notre tete…\nOn peut utiliser sa tete des 2 cote pour pousses ses frames (tete vers son nombril / plexus ) et on pousse vraiment ses bras on peut le mettre sur le cote de son bras et passe en 3/4 mount…\nNe pas mettre hanche gauche sur le mat mais essayer de l’avoir sur lui et peser sur lui\nCrossface grip meregali: le bras gauche va loin il attrape son aisselles et le ramene vers lui mettre la pression avec le biceps et mettre notre tete a plat tt a droite\nPrincipe de tordre son corp pr finir les passages\nPour aller en 3/4 on part vers la droite et on sort notre genou\ncrossface grip meregali on part vers la droite et on sort notre genou pr aller en 3/4 si il tient et que sa main droite est leve on change de cote le crossface notre main droite prend loin derrière son kim pression biceps on a pas d’underhook mais monté facile\nCrossface en 3/4 on doit mettre le plus d’espace possible entre son bras pris et ses hanches. Position tripod Pour sortir notre jambe dans la demi avec la jambe gauche on viens pas seulement pousser ses jambes on met la jambe gauche sur sa cuisse et on sprawl dessus .\nCrossface en 3/4 on change sa tete de cote leve fort nos hanches knee cut on prend l’autre underhook et on kick sa jambe .\nEn 3/4Backtake possible avec underhook gauche\nSi l’adversaire met un crochet papillon ob met notre hanche gauche sur le mat on met bien le crosse face meregali puis on va tt a droite on cherche la monte ou au pire on arrive c to c\nSoumission : en c2c on garde l’underhook et on fait passer la jambe gache par dessus sa tete on peut kimura\nSoumission 2 meme setup armbar : pour casser son grip on prend grip kimura avec notre jambe gauche du coup libre on kick sa jambe pour sortir notre jambe droite de la demi on fait une x dans ses bras et ça devrait passer\nSoumission 3 : en c2c on prend une sorte de crucifix avec notre jambe gauche on se met sur hanche gauche on tend son bras il liberera notre jambe droite on ferme une sorte de triangle du mauvais cote on attrape son bras au niveau du coupe grip calin on le ramene vers sois et on avance la tete il peut souvent se lever transition facile kimura triangle omoplata…\nSoumission 4 de Thibault avec lapel", "links": [], "ph": 0}, {"n": "Chest to chest (Gordon Ryan)", "cat": "Passages", "body": "中英双语Gordon Ryan Half Guard Passing 过半防 (vidéo dans les liens)\nconcept et placement\nPrendre son temps dans la position mettre son poids sur poitrine adversaire\nBATTRE KNEE SHIELD :\nil faut enchainer tt ses techniques envoyer bcp d’info et par moment feinter crosseface ou underhook et tourner poigner pr prendre autre chose\non peut poser nos deux mains sur l’epaule de l’adversaire et notre front sur son epaule gauche marcher vers la droite et avoir le c2c\n[photo]\nSi ça marche pas on peut egalement sur mettre sur ses hanches\n[photo]\nDe la on feinte le passage ou des soumissions pr qu’il concede le c2c on sort le genou lorsqu’il veut le repousser on prend l’underhook et le c2c\n[photo]\non peut se lever se mettre en headquarter et bloquer le knee shield avec le bras\nDilemme crazy dog ou main sur les hanches et on cherche inside position\nLorsque l’on inverse les hanches (ou dans d’autres situations) mais qu’on arrive pas a passer on prend le grip pantalon en attrapant sa cheville et on met bien la pression sur la personne\n[photo]\nDe la on peut 1/ mettre la pression vers la droite et OUVRIR coude pour passer  2/ backstep ou highstep pour passer 3/ prendre direct la montée si il shoot son pied 4/ faire des dilemmes avec tt ca\nPrendre grip over under pousser le knee shield vers la droite et mettre notre genou gauche sur lui tt en gardant notre cheville gauche entres ses 2 jambes\n[photo]\nDe la on peut passer en backstep puis sortir son genou pris ou 360 vers la gauche to saddle ou leg locks\nBattre crochet papillon\nFaire peser les hanches vers l’arrière attraper le genou dilemme montee ou kneecut\nFinir chest to chest\nAu dela de fermer le grip sur le crossface il faut fermer les coudes a part si on passe en tripod on met loins les mains\nOn part vers la droite pour eviter qu’il remette le genou ou crochet papillon\nPassage en side en levant les hanches position tripod et genou le plus haut possible pour eviter le knee shield et knee cut au lieu de knee cut\nPour aller en monter meme schema mais on va a droite et liberer patiemment genou avec jambe gauche\nPour soumettre pendant qu’on prend la montée on met tibia gauche sur son bras et on ferme une sorte de triangle\n[photo]\nde la on prend kimura grip et on ferme le triangle : de la finish en triangle (on tire la deuxième main pour mieux finir, ou kimura, ou si il ferme ses mains armbar ou cle de poignée\n[photo]", "links": ["https://b23.tv/XbK1wiY"], "ph": 8}, {"n": "Clé de cheville (Musumeci + YT)", "cat": "Soumissions", "body": "La tete doit etre aligné au genoux\nDescendre max grip cheville et important :faire un cercle en attrapant la cheville pour attraper la partie faible\nPression sur les petits doigts pas les gros\nOn supprime l’épaule on se met complètement sur l’epaule et on doit reculer nos hanches et epaules on met la main droite au sol et on se pousse pour faire un arc de cercle (notre dos se rapproche de son autre pied)\nBreaking mecanique : la pression doit également etre mise sur le haut du tibia ça créer la tension s’aider en tenant grip tibia main (comme stv casser un stylo en 2 tu vas prendre les 2 extrémités pas juste un bord)\nFrame avec les jambes très important en butterfly ashi(ba) le bout des doigts de pied touche l’érouller de l’autre jambe, en single x(sx) la jambe gauche connecte a mon genoux serrer fort\nRetention ba : jambe du haut si il l’a met vers l’extérieur je fais degripper comme spider si il l’a met vers l’intérieur enrouler sa main comme sortie spider et la pousser\nRetention ba jambe du bas : si il veut l’attraper je pousse avec main droite son col , si il l’a attrapé je me met sur mon epaule gauche je sureleve sa jambe et je rentre le genou de la jambe du bas a l’intérieur pr bon crochet\nBellydown depuis ba : on le pousse fort en mettant pied droit sur pec quand il est a distance on se met sur les genoux garder pied gauche la ou il est la et pied droit qui le pousse. Puis front au sol genou qui s’écarte on fait la cle et on descend doussement comme si on voulait que ma poitrine touche le sol\nBa : Si il defend en partant du mauvais cote je met met mon le talon pied droit sur sz hanche extérieur j’attrape mon coude avec main droite je me met sur le coude et je roule fort sur mon epaule\nSX : si il defend en ouvrant la garde et sortant ses hanches sur lettre sur les genoux et belly down", "links": [], "ph": 0}, {"n": "Clé de cheville (Aoki)", "cat": "Soumissions", "body": "szczecinski(a soumis tacket) : Mateusz Szczecinski - Shotgun Aoki Locks\nConcept\nGrip:\n[photo]\nL’importantance de garder grip cheville en outside ashi\n[photo]\nCrochets\n[photo]\ngérer adversaire debout\n[photo]\nEntrées\nk guard\n[photo]\nX guard\n[photo]\nRdlr\n[photo]\nfinish\nButterfly ashi\n[photo]\nOutside ashi\n[photo]\nBellydown\n[photo]\nMatrix\nOn peut attaquer basiquement la matrix quand il tourne vers l’intérieur on le finit en se relevant si il résiste\n[photo]\nX hook\n[photo]\nX hook reaction 2\n[photo]\nX hook leg drag\n[photo]", "links": [], "ph": 15}, {"n": "Col manche", "cat": "Gardes", "body": "Collar & Sleeve Guard A Systematic Approach By Isaac Doederlein : Collar & Sleeve Guard a Systematic Approach.. | bjj for everyone | VK\nConcept :\nSi on setup de la garde ouverte on ferme bien les coudes et on met éventuellement une shallow lasso avant\nOn casse bien la posture et on met bien la pression avec nos pieds\nSi il attrape ma main droite on met la pression avec le pied droit sur l’epaule on fait degripper et on reprend le col\nSi il attrape  jambe sur le biceps on prend shallow lasso pied gauche on casse la posture et on remet le pied sur le biceps si il bloque on remet le pied gauche sur la hanche et mouvement circulaire\nSi il recule et désengage on met la pression avec led jambes et on fait des langoustes\nSon coude ne doit pas etre entre nos genoux mais plutôt entre genou et hanche gauche faut gagner la bataille\nPour gagner la bataille du coude si il a notre col on tend la jambe gauche puis on met le tibia sur son biceps on leve nos hanches il va degripper\nTransitions :\nDLR : Quand il ferme bien debout de sorte a ce que je ne puisse pas attaquer le haut de son corps on oriente nos hanches et on prend dlr avec un crochet bien mis : de la si on tirer fort son bras et kick son epaule avec jambe droite on a facilement omoplata si il rentre le coude scissor\nAutre possibilité sweep depuis transition dlr :\n[photo]\nDepuis la collar sleeve dlr bcp de sweep type situp possible\nK guard\nMatrix\nDlr x\nSoumissions :\nOmoplata : On met notre genou sur son biceps et casse bien la posture puis on envoie\n[photo]\nArmbar :Lorsqu’il se met dans une sorte de headquarter genou droit au sol on fait une cle de bras sur son autre bras en formant comme une omoplata\n[photo]\ntriangle depuis scissor sweep 2 on a facilement sa main et sa tete avant de parfaitement réajuster le triangle on croise son bras pour faciliter\nLoop choke souvent possible quand adversaire a genoux a combiner avec scissor\nsweep :\nscissor sweep possible quand il pose le genou droit on ramene son col jusqu’a notre genou on met le pied droit sous son aisselle et on envoie\n[photo]\nAutre variation quand il est fort on met notre tibia en barrage sur son bras et torse on se met sur notre coude et avec la jambe gauche on kick son genou (de cette position triangle facile)\n[photo]", "links": [], "ph": 7}, {"n": "Deep half to X (Will Wilson)", "cat": "Gardes", "body": "Commencer de préférence le placement du pied gauche des le début\nPour ajuster les crochet penser a pousser l’adversaire vers le haut et tt droit mais ne pas le laisser s’échapper\nAjuster le crochet gauche puis le droit\nAutre cle possible x debout, sol , sx cross, 50/50, caio terra(dlr)…", "links": [], "ph": 0}, {"n": "De la Riva (passage)", "cat": "Passages", "body": "SHUTTING DOWN THE DE LA RIVA : 泰楠过德拉 (vidéo dans les liens)\nposition\non est paralelle a l'adversaire et le genou et les orteilles pointent vers l'exterieur\njambe libre constamment active\non ouvre pas juste le genou on essaye d'emmener notre jambe droitee le plus a droite possible\nappuyer sur son croche dlr\nson autre jambe on le met en headquarter ou on la tend\npassages\nWindshield Wiper : on tend sa jambe libre et on colle notre poitrine contre son tibia\n[photo]\npuis grip ceinture avec main gauche on pousse son crochet au point qu'il touche le sol, on ouvre notre genou puis on le met au sol derriere son crochet notre tibia touche son tibia de la on peut sprawl pour enlever le grip, crazy dog, longstep , passage en pression, knee cut...\nknee cut : on se met en headquarter, genou gauche met la pression sous sa cuisse, on prend un underhook pas grave si il est pas haut on remonte pendant la technique, on fait un grand pas avec le pied pas pris sur le cote avec l'autre main on pousse son genou s il est fort et qu'on arrive pas a l'envoyer\n[photo]\npuis on pose cette main loin devant au sol on envoie le knee cut : notre genou bouge avant notre corps pour guider : on croise : e haut a gauche pas juste a gauche, on ajuste l'underook on colle sa poitrine et on finit.\nsi pendant le knee cut il arrive a avoir un knee shield c qu'on est parti sur le cote au lieu de en croise (en haut + cote) si malgre tt on arrive dzns cette position on attrape nos mains sur l'underhook on le tire vers nous on inverse les hanches 2 fois et on finit\nsi on a pas acces a l'underhook on prend le col on ferme le coude on fait les memes etapes au moment d'envoyer le knee cut on le tire vers nous puis pour finir on le plante au sol\nleg weave : headquarter on attrape le col on tape son genou vers le bon cote puis on attrape la hanche on met tt son corps sur le cote\n[photo]", "links": ["https://b23.tv/BMlev40"], "ph": 3}, {"n": "Duck under (Cole Abate)", "cat": "Passages", "body": "On attrape la ceinture avec les 2 mains, Si l’adversaire ne met pas de poid sur sa jambe pas besoin de ce mettre sur les hanches meilleur position :\n[photo]\nPassage de base : on prend son col opposé et on ne va pas seulement en side on le tir pour le ramener vers nous\n[photo]\nSi il met du poid sur ces jambes on peut passer en long step de l’autre cote\nPour leg drag on se met complètement sur l’epaule\n[photo]\nPuis on prend son genou droit le balance de l’autre cote et on tend notre jambe droite", "links": [], "ph": 3}, {"n": "K guard (Lachlan Giles)", "cat": "Gardes", "body": "DeepSeek-R1中英双语 蓝蓝 - K Guard (vidéo dans les liens)\nConcept : genou adveraire sur notre estomac\n[photo]\nKguard to spin 70/30 to back\n[photo]\nK guard to x\n[photo]\nK guard to ankle lock\n[photo]", "links": ["https://b23.tv/0VogQmk"], "ph": 4}, {"n": "K guard (Cole Abate)", "cat": "Gardes", "body": "Charger l’adversaire vers l’avant quand on place la guard\nMain droite col opposé\nCasser la posture\nSi l’adversaire attaque la jambe droite je kick bien son arrière epaule avec jambe gauche ou transition en single x\nSi l’adversaire vers l’arrière transition x\nSi vers l’avant transition matrix\nSweep : passer vers l’arrière, x, sweep type x en kickan, matrix,\nSoumissions (surtout si il veut attaquer ma jambe): triangle , omoplata , shutgun armbar leg locks", "links": [], "ph": 0}, {"n": "Knee cut", "cat": "Passages", "body": "Lucas Lepri Precision Knee Cut Passes (vidéo dans les liens)\ndepuis dlr :\non attrape le col et pantalon cheville de l'adversaire\n[photo]\non met notre coude sur son crochet dlr pour l'affaiblir\n[photo]\non backstep avec la jambe gauche et on le ramene vers nous en meme temps puis on le fait tourner en tournant sa jambe et on avance le genou. si il arrive quand meme a mettre un knee shield grace au poid de ma jambe exterieur je donne un coup d'epaule  a son knee shield sur le cote pour l'enlever\n[photo]\nlorsqu'il va vouloir frame on attrape son triceps et on profite pour finir le passage.\nweave pass :\non fait quand il met un knee shield et que mon bras qui tient le col est plus en frame : on garde le col on plante le coude sur son genou et l'autre main on tiens sa manche\n[photo]\non me le poid vers l'avant puis on fait une vague avec genou droit a gauche puis a droite on fini en partant de l'autre cote ou en combinant avec un passage\ntripod knee cut :\nautre solution si on arrive knee shield\n[photo]\non se met en tripod main droite crazy dog main gauche col cote, on libere jambe droite en allant a gauche,\n[photo]\nlorsqu'il va refaire face genou droit entre ses jambe comme en leg weave la cheville pas entre ses jambes mais bien a l'exterieur\n[photo]\navec la main gauche on prend son triceps. on met le pied gauche entre ses jambes on leve les hanches et on knee cut\n[photo]", "links": ["https://b23.tv/htAyszS"], "ph": 8}, {"n": "Lasso / spider (passage)", "cat": "Passages", "body": "PASSING THE LASSO & SPIDER GUARD MASTERCLASS 01-KEY CONCEPTS (vidéo dans les liens)\nconcepts\nIl faut etre patient et avoir conscinece que ce genre de garde prend du temps a etre passe\nreconnaitre le scenario savoir si il va etre offensif / defensif...\nil faut d'abord desangager : quand on essaye de passer ce type de garde au lieu d'avancer on se leve et on recule constament. en reculant on a rapproche un max nos coudes de notre corprs. si c'est lasso on enroule le poignee si spider on prend c grip\nlorsque l'on a bien desangager on rapproche une de nos jambe de ses hanches et notre genou au niveau de son ischio puis on tourne nos poignets et on posture a fond.\nlorsqu'on lui fragilise un grip grace aux cercles avec le poignee on va du cote du grip gragilse on pose notre main sur lui et on marche avec nos doigts vers le haut\nquand la personne tend le jamnbe et qu'on a du mal avec la spider\n[photo]\nje met mon genou oppose dessus\n[photo]\npuis je fais un cercle avec mon poigne et je passe.", "links": ["https://b23.tv/HnGFHr1"], "ph": 2}, {"n": "Longstep", "cat": "Passages", "body": "La tete ne doit pas etre au niveau de sa tete avant de lancer garder sous sa ligne de genoux\nLorsque l’on met sa tete au debut important de s’assurer de battre le knee shield\nGrip on tient le col puis on le clout par terre pour que l’adversaire puisse plus bcp bouger\nGrip triceps grip col derrière la tete , grip ceinture egalement possible mais moins ideal\nL’autre main (au niveau des jambes) ne doit pas accrocher la jambe du haut, une fois qu’on a lance on repousse avec cette main la jambe qui revient (souvent celle du bas) pour se mettre en tripod\nPuis lance le longstep on essaye d’etre alligne a son epaule\nLorsque l’on atteri on se met direct en tripod a la bonne distance\npossible depuis 1 lasso (derouler d’abord la main vers l’extérieur) on respecte les concepts et la on revient vers ses hanches pr pas être gene lasso\nDepuis dlr on casse la dlr en orientant genou et hanche vers l’intérieur puis extérieur puis sorte de knee slide puis on lance\nDepuis toreando on oriente les hanches on rentre le genou comme knee cut on prend grip et on lance", "links": [], "ph": 0}, {"n": "Matrix (Musumeci)", "cat": "Gardes", "body": "", "links": [], "ph": 0}, {"n": "Omoplata", "cat": "Soumissions", "body": "DeepSeek-R1中英双语Adam Wardzinski - Omoplata Re-discovered (vidéo dans les liens)\nEntrees\nCol manche : on leve nos hanches on casse bien sa posture puis on plie son bras on envoie et on profite du momentum pour bloquer ses hanches\n[photo]\nGarde fermé : squid , k guard , overhook\nX : si on contrôle le bras\n[photo]\nZ guard :\n[photo]\nOu overhook\n[photo]\nFinir omoplata :\n2 concept pour finir : contrôler les hanches et pin ses epaules\n1er option pour cela on desaxe nos hanches et on avance en diagonale si on le perd on tire son epaule prise\n2e option on prend le lapel de sorte a ce qu’il soit fort\n[photo]\nOn desaxe nos hanches et on avance en diagonale\n[photo]\nCle de bras si on est dans cette position avec un underhook sur sa jambe\n[photo]\nPuis on rentre bien notre genou gauche a l’intérieur on tient son pied avec la main gauche et son bras avec la main droite on tend et on leve les hanches\n[photo]\nréactions si il roule\n[photo]\nSi adversaire assis dos droit : technique Thibault avec lappel et marche sur le cote ou :\n[photo]\nclé de bras si il roule\n[photo]\nMatrix si il est debout\n[photo]\nRéaction si il passe au dessus\n[photo]\nTarikoplata\n[photo]", "links": ["https://b23.tv/6aRfZON"], "ph": 15}, {"n": "Over under", "cat": "Passages", "body": "DS-R1自制字幕Bernardo Faria - 老头柔术 - Over-Under Pressure Passing System (vidéo dans les liens)\nFinir Passage\nFinition de base\n[photo]\nFinir quand il pousse l’epaule\n[photo]\nFinir quand il pousse la tête\n[photo]\nstabiliser side\n[photo]\nStabiliser side si on peut pas attraper la tete\n[photo]\nKneebar\n[photo]", "links": ["https://b23.tv/TfTQtCK"], "ph": 6}, {"n": "Ruotolotine", "cat": "Soumissions", "body": "la main qui etrangle est en bas dans la ceinture de securite\n[photo]\npousser sa tete contre son epaule prise pour qu'il y'ait le moins d'espace possible\n[photo]\npour entrangler on ramener notre coude et notre dos vers nos hanches", "links": [], "ph": 2}, {"n": "Stack pass", "cat": "Passages", "body": "The Stack Pass by Andre Galvao Vol 1 (vidéo dans les liens)\nConcept\nDu cote de la main qui passe sous sa jambe et attrape le col on ferme le coude et on met du poids avec épaule\nL’autre main se met pas juste sur la jambe risque triangle on tiens la toile et on pin vers le bas\nPas trop le stack sinon il roule\n[photo]\nPassage\nBaseball bat pass\n[photo]\nContre si il pousse le coude\n[photo]\nSuper stack\n[photo]\nSingle Arm Snatch Stack (son favoris)\n[photo]\nLeg drag / leg drag inversé\n[photo]\nBacktake\n[photo]", "links": ["https://b23.tv/K64y4zs"], "ph": 7}, {"n": "Tripod pass (CJ)", "cat": "Passages", "body": "Concept\nordre : pin haut du corps puis bas du corps\ntete oppose underhook\nhaut du corps : main underhook tiens son arriere d'epaule et on colle notre epaule et poitrine tt en le tirant vers nous on leve haut les fesses position tripod, main gauche au sol pour repartir le poids, on le pousse vraiment contre le sol pour pas qu'il me repousse ou prenne d'overhook fort poid vraiment reparti sur le haut\nbas du corp : pour pas qu'il me charge avec sa papillion vers sweep ou SX on doit bien placer sa tete et poid vers l'avant, on rapproche nos genoux vers ses fesses le plus possible au poit ou mon genou touche le coude de mon underhook il ne pourra pas prendre de garde fermé ou charger sinon il concede c2c\ndonc position initial :\n[photo]\nPassages :\nSi il veut rentrer en SX (on peut egalement declacher le mouvement en poussant sa cuisse avec notre genou droit\n[photo]\non leve le coude droit et on pose le genou droit\n[photo]\nil ne lui restera qu'un crochet papillon on le passe comme un bodylock classique mais on pousse ce crochet pas que vers l'arriere vers le millieu aussi\n[photo]\nknee cut quand on a la bonne position on fait un knee cut a travers les 2 jambes\n[photo]\nsi c2c ou en general en c2c CJ conseil d'avoir l'underhook de l'autre cote (cote ou est notre corp) et la tete de l'autre cote\n[photo]\nainsi si il prend une demi papillion on peut facilement avoir la monté\n[photo]\nPour obtenir ce underhook du bon cote il suffit de faire comme si on voulait appliquer un crossface classique lorsqu'il va repousser la main on enroule la main et on prend le bon underhook\n[photo]", "links": ["https://www.bilibili.com/video/BV1sSPpekEvQ/"], "ph": 10}, {"n": "Waiter (Lachlan Giles)", "cat": "Gardes", "body": "Surtout pas laisser l’underhook a l’adversaire\nLa jambe de l’adversaire ne doit pas toucher le sol\nGerer la distance avec jambe droite qui peut etre mis sur l’adversaire pour le pousser\ncréer de l’espace lever les hanches\n3 grips : underhook, c grip, overhook(vulnérable attention)\nSetup dlr pied droit derrière cuisse\nEntree facile si genou au sol\nSetup deep bien ramener les jambes vers soit\nSweep de base si jambe debout\nSi underhook transition x\nSi overhook transition single x + aoki or ankle\nTransition X de l’autre cote\nBacktake de base accorche la hanche main droite , aller dans un reverse half guard ne pas  le laissr mettre sa main face a nous en le collant au maximum et contrôler ses hanches avec un main en haut de ses hanches et l’autre en bas(sur la meme hanche) coude et crochet fermé genou droit sur sa poitrine on set en belly down et on attaque le dos\nBacktake crabride : c grip lever la jambe mettre sur molet gauche rentrer le crochet droit puis kick la jambe droite jusqu’a la fin.\nBest backtake : commencer a partir reverse half guard mais on met crochet droit sur son aisselle fort, tendre sa jambe droite avec notre jambe gauche si il reste haut possible de sauter sur le dos si il s’assoit possibilité de finir en bolo\nReverse waiter lever sa jambe avant de tourner et shooter sa jambe comme celui du crab ride", "links": [], "ph": 0}, {"n": "Waiter (Ryan Hall)", "cat": "Gardes", "body": "Sweep de base si il resiste on peut prendre prendre appuie avec la jambe droite au sol l’emmener vert l’avant puis fort vers l’arrière avec un mouvement de balancier / pendule du pied droit\n[photo]\nUne fois qu’on a sweep on peut finir en over under mais aussi leg drag : on fait passer son pied derrière notre tete on rentre notre crochet droite a l’intérieur pour liberer le gauche puis on se place en leg drag\n[photo]\nBacktake :\n[photo]\non prend le lapel on pousse les hanches par dessus notre tete sa jambe doit etre sur nous et pas au sol\n[photo]\nAvec la jambe gauche on fait la passe pour rentrer le crochet droit,\n[photo]\nOn le pousse vert l’avant et on prend le dos (on garde bien notre coude droit derrière son dos pour qu’il puisse pas tourner)\n[photo]\nRoll backtake : on pousse ses hanches cette fois si corp doit etre au sol on change les crochets et on s’installe\n[photo]\nOn roule sur l’épaule droite et on prend le dos\n[photo]", "links": [], "ph": 9}, {"n": "X guard (Tainan)", "cat": "Gardes", "body": "Important d avoir tjr un controle en x si il fait degripper on peut tjr attraper sa ceinture avc m droite\nEntre hakim : dela riva passer jambe droite intérieur et jambe gauche sur la hanche on casse la posture important mouvement de hanche a droite puis a gauche.\nEntre dlr underhook : attraper tibia et plie le bras pas le tendre, important casser la posture, monter jambe gauche debut x et kicker sa jambe avec la droite puis entrer en x\nLorsqu’il contrôle la manche possibilité de sweep cole abate en prenant une single x de l’autre cote en meme temps\nLorsque l’adversaire tiens le col on peut sweep : charger vers l’avant fort lorsqu’il revient pousser vers l’arrière\nBacktacke en waiter possible en prenant underhook des 2 côté puis transition", "links": [], "ph": 0}, {"n": "Z guard", "cat": "Gardes", "body": "", "links": [], "ph": 0}]};
+const JJB_CATS = ['Passages', 'Gardes', 'Dos', 'Soumissions', 'Autre'];
+const JT_STATUS = [['learn', 'À travailler'], ['drill', 'En drill'], ['placed', 'Placée en sparring']];
+function jjbData() {
+  let d = Store.get('jjb');
+  if (!d) {
+    const mk = (n, target, score, extra) => Object.assign({ id: 't' + newId(), n, st: 'cur', target, score, moves: [], note: '', links: [], media: [], log: [] }, extra || {});
+    d = {
+      kind: 'jjb', v: 1,
+      method: 'Chaque phase : drill, puis thème, puis à mettre en sparring.\n5 techniques max par bloc.',
+      links: [{ t: 'Train BJJ (vidéos)', u: 'https://m.vkvideo.ru/@bjjforeveryone' }],
+      pts: { good: 2, white: 1 },
+      themes: [
+        mk('Stack pass / cross grip', 15, 9),
+        mk('Over under', 15, 10),
+        mk('HQ', 30, 1, { note: 'Regarder la vidéo (knee cut, leg weave…)' }),
+        mk('Ankle S', 30, 16, { moves: [{ n: 'K to X', p: 1 }, { n: 'Ankle', p: 2 }] }),
+        mk('Demi', 100, 8, { moves: [{ n: 'Waiter sweep', p: 1 }, { n: 'Waiter deep to X', p: 2 }, { n: 'Backtake', p: 3 }, { n: 'Choibar', p: 3 }] }),
+        mk('Ninja choke / Mougouchoke', 30, 2),
+      ].concat(JJB_SEED.fut.map(f => mk(f.n, 30, 0, { st: 'fut', links: f.links }))),
+      spec: [
+        { id: 's' + newId(), n: 'Headquarter', note: 'Rentrer / maintenir / passer', ok: 0 },
+        { id: 's' + newId(), n: 'Demi', note: '', ok: 0 },
+        { id: 's' + newId(), n: 'Prise de dos', note: 'Maintenir connexion chest to back sans accrocher ses mains -> bodylock dans le dos.\nBut : prendre le dos avec ceinture de sécurité ou maintenir connexion -> dos 1 crochet.\nBut : soumission ou rester 10 secondes avec 3 crochets.', ok: 0 },
+      ],
+    };
+    if (IS_ARTIFACT && !Store.synced && Store.state !== 'local') return d; // on attend tes données avant de créer quoi que ce soit
+    Store.set('jjb', d);
+    if (!Object.keys(Store.docs).some(id => id.startsWith('jt-'))) JJB_SEED.enc.forEach((e, i) => Store.set('jt-' + newId() + i, { kind: 'jtech', n: e.n, cat: e.cat, body: e.body, links: e.links, media: [], status: 'learn', ph: e.ph, up: Date.now() }));
+  }
+  return JSON.parse(JSON.stringify(d));
+}
+const saveJjb = d => Store.set('jjb', Object.assign({ kind: 'jjb' }, d));
+const jtechs = () => Object.entries(Store.docs).filter(([id, d]) => id.startsWith('jt-') && d && d.kind === 'jtech').map(([id, d]) => Object.assign({ _id: id }, JSON.parse(JSON.stringify(d)))).sort((a, b) => a.n.localeCompare(b.n, 'fr'));
+const linkify = t => esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\.|^m\./, ''); } catch (e) { return 'lien'; } };
+function mediaGrid(list, owner) {
+  if (!list || !list.length) return '';
+  return `<div class="jmedia">${list.map((m, i) => `<div class="jm">${m.type === 'video' ? `<video src="${esc(blobSrc(m.id))}" data-blob="${esc(m.id)}" controls playsinline preload="metadata"></video>` : `<img src="${esc(blobSrc(m.id))}" data-blob="${esc(m.id)}" alt="" data-a="jjbZoom" data-x="${esc(m.id)}">`}<button class="jdel" data-a="jjbMediaDel" data-x="${esc(owner)}" data-i="${i}" aria-label="Retirer">×</button></div>`).join('')}</div>`;
+}
+function linksList(list) { return list && list.length ? `<div class="chips">${list.map(u => `<a class="chip" href="${esc(u)}" target="_blank" rel="noopener">▶ ${esc(hostOf(u))}</a>`).join('')}</div>` : ''; }
+function jjbWeek() { let n = 0; for (let i = 0; i < 7; i++) if (getDay(addDays(today(), -i)).jjb) n++; return n; }
+
+function viewJJB() {
+  const d = jjbData(), tab = UI.jjbTab || 'themes';
+  const cur = d.themes.filter(t => t.st === 'cur');
+  const tot = cur.reduce((a, t) => a + Math.min(t.score, t.target), 0), goal = cur.reduce((a, t) => a + t.target, 0);
+  const done = getDay(today()).jjb;
+  const seg = [['themes', 'Thèmes'], ['tech', 'Techniques'], ['timer', 'Timer']];
+  let body = tab === 'tech' ? jjbTechTab() : tab === 'timer' ? jjbTimerTab() : jjbThemesTab(d);
+  return `<div class="jhero dark"><div style="position:relative;z-index:1"><span class="lbl">Tatami</span><h1>JJB</h1><span class="mut small">${jjbWeek()} entraînement${jjbWeek() > 1 ? 's' : ''} sur les 7 derniers jours</span></div>
+    <div class="jstats"><div><b>${cur.length}</b><span>thèmes en cours</span></div><div><b>${goal ? Math.round(tot / goal * 100) : 0}%</b><span>objectif du bloc</span></div><div><b>${jtechs().filter(t => t.status === 'placed').length}</b><span>techniques placées</span></div></div>
+    <div class="row"><button class="btn acc grow" data-a="jjbTab" data-x="timer">${IC.play || ''} Timer</button><button class="btn grow" data-a="jjb">${done ? '✓ JJB fait aujourd\'hui' : 'J\'ai fait mon JJB'}</button></div></div>
+  <div class="seg sticky" role="tablist">${seg.map(([k, l]) => `<button data-a="jjbTab" data-x="${k}" class="${tab === k ? 'on' : ''}" role="tab" aria-selected="${tab === k}">${l}</button>`).join('')}</div>` + body;
+}
+function themeCard(t, pts) {
+  const pc = clamp(t.score / t.target * 100, 0, 100), full = t.score >= t.target;
+  return `<div class="card jtheme"><div class="row sp" style="align-items:flex-start"><button class="grow" style="text-align:left" data-a="jjbTheme" data-x="${t.id}"><h3>${esc(t.n)}</h3>${t.note ? `<div class="mut small">${esc(t.note)}</div>` : ''}${t.moves.length ? `<div class="mut small">${t.moves.map(m => esc(m.n) + ' +' + m.p).join(' · ')}</div>` : ''}</button><span class="jscore num">${fr(t.score)}<small>/${t.target}</small></span></div>
+  <div class="bar"><i style="width:${pc}%;background:${full ? 'var(--ok)' : 'var(--acc)'}"></i></div>
+  <div class="row"><button class="btn sm acc grow" data-a="jjbPlace" data-x="${t.id}">${IC.plus} Placée en sparring</button><button class="btn sm" data-a="jjbTheme" data-x="${t.id}">Détails</button></div>${full ? `<div class="valid">${IC.check} Objectif atteint. Valide le thème dans Détails.</div>` : ''}</div>`;
+}
+function jjbThemesTab(d) {
+  const cur = d.themes.filter(t => t.st === 'cur'), fut = d.themes.filter(t => t.st === 'fut'), acq = d.themes.filter(t => t.st === 'done');
+  return `<div class="card"><div class="row sp"><h3>Méthode</h3><button class="link" data-a="jjbMethod">Modifier</button></div><div class="mut" style="white-space:pre-line">${linkify(d.method)}</div>
+    <div class="mut small">Points : bon adversaire ×${d.pts.good} · ceinture blanche ×${d.pts.white}</div>${d.links.length ? `<div class="chips">${d.links.map(l => `<a class="chip" href="${esc(l.u)}" target="_blank" rel="noopener">▶ ${esc(l.t)}</a>`).join('')}</div>` : ''}</div>
+  <div class="row sp"><h2>Thèmes actuels</h2><span class="pill ${cur.length > 5 ? 'warn' : ''}">${cur.length}/5</span></div>
+  ${cur.length > 5 ? `<div class="tip">Ta règle : 5 techniques max par bloc. Valide ou repousse un thème pour rester concentré.</div>` : ''}
+  ${cur.map(t => themeCard(t, d.pts)).join('') || '<div class="empty">Aucun thème en cours. Pioche dans tes futurs thèmes.</div>'}
+  <div class="row sp"><h2>Spécifique (écologique)</h2><button class="btn sm" data-a="jjbSpecNew">${IC.plus} Ajouter</button></div>
+  <div class="card"><div class="list">${d.spec.map(s => `<div class="item" style="align-items:flex-start"><button class="n" style="white-space:normal;text-align:left" data-a="jjbSpec" data-x="${s.id}"><b>${esc(s.n)}</b>${s.note ? `<br><span class="mut small" style="white-space:pre-line">${esc(s.note)}</span>` : ''}</button><button class="chip" data-a="jjbSpecOk" data-x="${s.id}" aria-label="Réussi une fois de plus">✓ ${s.ok || 0}</button></div>`).join('') || '<div class="empty">Rien pour l\'instant.</div>'}</div></div>
+  <div class="row sp"><h2>Futurs thèmes</h2><button class="btn sm" data-a="jjbThemeNew">${IC.plus} Ajouter</button></div>
+  <div class="card"><div class="list">${fut.map(t => `<div class="item"><button class="n" style="white-space:normal;text-align:left" data-a="jjbTheme" data-x="${t.id}">${esc(t.n)}${t.links.length ? ` <span class="pill acc">vidéo</span>` : ''}</button><button class="btn sm" data-a="jjbStart" data-x="${t.id}">Démarrer</button></div>`).join('') || '<div class="empty">Liste vide.</div>'}</div></div>
+  ${acq.length ? `<details class="card"><summary><b>Thèmes validés (${acq.length})</b></summary><div class="list">${acq.map(t => `<button class="item" data-a="jjbTheme" data-x="${t.id}"><span class="n">${esc(t.n)}</span><span class="k">${fr(t.score)}/${t.target}</span></button>`).join('')}</div></details>` : ''}`;
+}
+function jjbTechTab() {
+  const all = jtechs(), q = norm(UI.jtq || ''), cat = UI.jtcat || '';
+  const list = all.filter(t => (!cat || t.cat === cat) && (!q || norm(t.n + ' ' + t.body).includes(q)));
+  const byCat = JJB_CATS.map(c => [c, list.filter(t => (JJB_CATS.includes(t.cat) ? t.cat : 'Autre') === c)]).filter(([, l]) => l.length);
+  const st = Object.fromEntries(JT_STATUS);
+  return `<div class="row"><input id="jt-q" type="search" placeholder="Chercher : knee cut, omoplata…" value="${esc(UI.jtq || '')}" data-jq="1" autocomplete="off"><button class="btn pri" data-a="jjbTechNew" aria-label="Nouvelle technique">${IC.plus}</button></div>
+  <div class="chips scroll"><button class="chip ${!cat ? 'on' : ''}" data-a="jjbCat" data-x="">Tout (${all.length})</button>${JJB_CATS.map(c => `<button class="chip ${cat === c ? 'on' : ''}" data-a="jjbCat" data-x="${c}">${c}</button>`).join('')}</div>
+  ${byCat.map(([c, l]) => `<span class="lbl">${c}</span><div class="card" style="padding:4px 16px"><div class="list">${l.map(t => `<button class="item" data-a="jjbTech" data-x="${esc(t._id)}"><span class="n">${esc(t.n)}</span>${t.media.length ? `<span class="mut small">${t.media.length} média${t.media.length > 1 ? 's' : ''}</span>` : ''}<span class="pill ${t.status === 'placed' ? 'ok' : t.status === 'drill' ? 'warn' : ''}">${st[t.status] || 'À travailler'}</span></button>`).join('')}</div></div>`).join('') || '<div class="empty">Rien trouvé.</div>'}`;
+}
+function noteBody(txt) {
+  return (txt || '').split('\n').map(l => {
+    if (l === '[photo]') return '<div class="jph">Photo de tes notes à remettre ici</div>';
+    if (!l.trim()) return '';
+    const head = l.length < 48 && /:\s*$|^(concept|concepts|passages?|entr[ée]es|transitions|soumissions?|sweep|finish|position|grip|crochets)\b/i.test(l.trim());
+    return head ? `<h4>${linkify(l.replace(/\s*:\s*$/, ''))}</h4>` : `<p>${linkify(l)}</p>`;
+  }).join('');
+}
+
+/* --- sheets --- */
+function shJjbTheme(s) {
+  const d = jjbData(), t = d.themes.find(x => x.id === s.id);
+  if (!t) return sheetHead('Thème') + '<div class="empty">Introuvable.</div>';
+  if (s.edit) {
+    const dr = s.dr;
+    return sheetHead(t.n ? 'Modifier le thème' : 'Nouveau thème') + `<div class="field"><label for="jt-n">Nom</label><input id="jt-n" value="${esc(dr.n)}" data-jin="n"></div>
+    <div class="grid2"><div class="field"><label for="jt-tg">Objectif (points)</label><input id="jt-tg" inputmode="numeric" value="${esc(dr.target)}" data-jin="target"></div><div class="field"><label for="jt-sc">Points actuels</label><input id="jt-sc" inputmode="decimal" value="${esc(dr.score)}" data-jin="score"></div></div>
+    <div class="field"><label for="jt-nt">Note</label><textarea id="jt-nt" rows="3" data-jin="note">${esc(dr.note)}</textarea></div>
+    <div class="field"><label for="jt-mv">Variantes et points (une par ligne, ex. « Backtake +3 »)</label><textarea id="jt-mv" rows="3" data-jin="mv" placeholder="Laisse vide si une seule technique">${esc(dr.mv)}</textarea></div>
+    <div class="field"><label for="jt-lk">Liens vidéo (un par ligne)</label><textarea id="jt-lk" rows="2" data-jin="lk">${esc(dr.lk)}</textarea></div>
+    <button class="btn pri full" data-a="jjbThemeSave">Enregistrer</button>${t.n ? `<button class="btn danger full" data-a="jjbThemeDel">Supprimer le thème</button>` : ''}`;
+  }
+  const P = d.pts;
+  return sheetHead(t.n) + `<div class="row wrap"><span class="pill ${t.st === 'done' ? 'ok' : t.st === 'cur' ? 'acc' : ''}">${t.st === 'done' ? 'Validé' : t.st === 'cur' ? 'En cours' : 'Futur thème'}</span>${t.st !== 'fut' ? `<span class="pill">${fr(t.score)} / ${t.target} points</span>` : ''}</div>
+  ${t.note ? `<div style="white-space:pre-line">${linkify(t.note)}</div>` : ''}
+  ${t.moves.length ? `<div class="mut small">${t.moves.map(m => esc(m.n) + ' +' + m.p).join(' · ')}</div>` : ''}
+  ${linksList(t.links)}${mediaGrid(t.media, 'th:' + t.id)}
+  <div class="grid2"><button class="btn sm" data-a="jjbMediaAdd" data-x="th:${t.id}">${IC.cam} Photo / vidéo</button><button class="btn sm" data-a="jjbThemeEdit">Modifier</button></div>
+  ${t.st === 'cur' ? `<button class="btn acc full" data-a="jjbPlace" data-x="${t.id}">${IC.plus} Placée en sparring</button>` : ''}
+  ${t.st === 'fut' ? `<button class="btn pri full" data-a="jjbStart" data-x="${t.id}">Démarrer ce thème</button>` : ''}
+  ${t.st === 'cur' ? `<div class="grid2"><button class="btn sm ok" data-a="jjbThemeSt" data-x="done">Thème validé</button><button class="btn sm ghost" data-a="jjbThemeSt" data-x="fut">Remettre en futur</button></div>` : ''}
+  ${t.st === 'done' ? `<button class="btn sm ghost full" data-a="jjbThemeSt" data-x="cur">Reprendre ce thème</button>` : ''}
+  ${t.log.length ? `<span class="lbl">Historique</span><div class="list">${t.log.slice().reverse().slice(0, 30).map((l, i) => `<div class="item"><span class="n">${esc(fmtShort(l.d))}${l.m ? ' · ' + esc(l.m) : ''} <span class="mut small">${l.o === 'good' ? 'bon adversaire' : l.o === 'white' ? 'ceinture blanche' : 'ajustement'}</span></span><span class="k">${l.p > 0 ? '+' : ''}${fr(l.p)}</span>${i === 0 ? `<button class="chip" data-a="jjbUndo">Annuler</button>` : ''}</div>`).join('')}</div>` : ''}
+  <div class="mut small">Points : bon adversaire ×${P.good}, ceinture blanche ×${P.white}${t.moves.length ? ', multiplié par les points de la variante' : ''}.</div>`;
+}
+function shJjbPlace(s) {
+  const d = jjbData(), t = d.themes.find(x => x.id === s.id); if (!t) return sheetHead('Thème') + '';
+  const P = d.pts, moves = t.moves.length ? t.moves : [{ n: '', p: 1 }];
+  return sheetHead('Placée : ' + t.n) + `<div class="mut">Contre qui ? Un tap suffit.</div>` +
+    moves.map((m, i) => `<div class="card" style="background:var(--s2);border:0">${m.n ? `<h3>${esc(m.n)} <span class="mut small">+${m.p}</span></h3>` : ''}<div class="grid2"><button class="btn acc" data-a="jjbLog" data-x="good" data-i="${i}">Bon adversaire +${fr(m.p * P.good)}</button><button class="btn" data-a="jjbLog" data-x="white" data-i="${i}">Ceinture blanche +${fr(m.p * P.white)}</button></div></div>`).join('') +
+    `<div class="mut small">${fr(t.score)} / ${t.target} points pour l'instant.</div>`;
+}
+function shJjbSpec(s) {
+  const d = jjbData(), sp = d.spec.find(x => x.id === s.id) || { n: '', note: '' };
+  return sheetHead(sp.n ? 'Spécifique' : 'Nouveau spécifique') + `<div class="field"><label for="js-n">Situation</label><input id="js-n" value="${esc(sp.n)}" placeholder="Ex. : Headquarter"></div>
+  <div class="field"><label for="js-nt">Objectif / règles</label><textarea id="js-nt" rows="4" placeholder="Ex. : rentrer / maintenir / passer">${esc(sp.note)}</textarea></div>
+  <button class="btn pri full" data-a="jjbSpecSave">Enregistrer</button>${sp.n ? `<button class="btn danger full" data-a="jjbSpecDel">Supprimer</button>` : ''}`;
+}
+function shJjbMethod() {
+  const d = jjbData();
+  return sheetHead('Méthode') + `<div class="field"><label for="jm-t">Ta méthode d'entraînement</label><textarea id="jm-t" rows="4">${esc(d.method)}</textarea></div>
+  <div class="grid2"><div class="field"><label for="jm-g">Points bon adversaire</label><input id="jm-g" inputmode="decimal" value="${d.pts.good}"></div><div class="field"><label for="jm-w">Points ceinture blanche</label><input id="jm-w" inputmode="decimal" value="${d.pts.white}"></div></div>
+  <div class="field"><label for="jm-l">Liens (« Nom | lien », un par ligne)</label><textarea id="jm-l" rows="3">${esc(d.links.map(l => l.t + ' | ' + l.u).join('\n'))}</textarea></div>
+  <button class="btn pri full" data-a="jjbMethodSave">Enregistrer</button>`;
+}
+function shJjbTech(s) {
+  const t = s.id ? Object.assign({}, Store.get(s.id)) : null;
+  if (s.edit || !t) {
+    const dr = s.dr;
+    return sheetHead(t ? 'Modifier' : 'Nouvelle technique') + `<div class="field"><label for="jk-n">Nom</label><input id="jk-n" value="${esc(dr.n)}" data-jin="n" placeholder="Ex. : Kimura trap (Gordon Ryan)"></div>
+    <div class="chips">${JJB_CATS.map(c => `<button class="chip ${dr.cat === c ? 'on' : ''}" data-a="jjbTechCat" data-x="${c}">${c}</button>`).join('')}</div>
+    <div class="field"><label for="jk-b">Notes (une idée par ligne, « Concept : » fait un titre)</label><textarea id="jk-b" rows="12" data-jin="body">${esc(dr.body)}</textarea></div>
+    <div class="field"><label for="jk-l">Liens vidéo (un par ligne)</label><textarea id="jk-l" rows="2" data-jin="lk">${esc(dr.lk)}</textarea></div>
+    <button class="btn pri full" data-a="jjbTechSave">Enregistrer</button>${t ? `<button class="btn danger full" data-a="jjbTechDel">Supprimer cette fiche</button>` : ''}`;
+  }
+  return sheetHead(t.n) + `<div class="chips">${JT_STATUS.map(([k, l]) => `<button class="chip ${t.status === k ? 'on' : ''}" data-a="jjbTechSt" data-x="${k}">${t.status === k ? '✓ ' : ''}${l}</button>`).join('')}</div>
+  ${mediaGrid(t.media, 'tk:' + s.id)}${linksList(t.links)}
+  <div class="grid2"><button class="btn sm" data-a="jjbMediaAdd" data-x="tk:${esc(s.id)}">${IC.cam} Photo / vidéo</button><button class="btn sm" data-a="jjbTechEdit">Modifier</button></div>
+  ${t.ph ? `<div class="tip">Tes notes avaient ${t.ph} photo${t.ph > 1 ? 's' : ''} que je n'ai pas reçue${t.ph > 1 ? 's' : ''}. Ajoute-les avec « Photo / vidéo ».</div>` : ''}
+  <div class="jnote">${noteBody(t.body) || '<div class="empty">Pas encore de notes.</div>'}</div>`;
+}
+function shJjbZoom(s) { return sheetHead('Photo') + `<img src="${esc(blobSrc(s.id))}" data-blob="${esc(s.id)}" alt="" style="width:100%;border-radius:12px">`; }
+
+/* --- timer (repris de Round Timer) --- */
+const RT_COLORS = ['#17935A', '#E8552D', '#2F6FEB', '#C98200', '#7C4DDB', '#0E8A8A', '#C4508C'];
+const RT_DEFAULTS = [
+  { name: 'JJB 5 rounds × 2', prep: 10, work: 300, rest: 30, rounds: 5, sets: 2, setRest: 120, warn: 10 },
+  { name: 'Sparring 6 min', prep: 10, work: 360, rest: 60, rounds: 6, sets: 1, setRest: 0, warn: 30 },
+  { name: 'Drills 2 min', prep: 10, work: 120, rest: 15, rounds: 8, sets: 1, setRest: 0, warn: 0 },
+  { name: 'Spécifique 1 min 30', prep: 10, work: 90, rest: 20, rounds: 10, sets: 1, setRest: 0, warn: 10 },
+];
+function rtPresets() {
+  const d = Store.get('jjbtimers');
+  if (d && Array.isArray(d.list)) return JSON.parse(JSON.stringify(d.list));
+  const list = RT_DEFAULTS.map((p, i) => Object.assign({ id: 'p' + newId() + i, color: RT_COLORS[i] }, p));
+  Store.set('jjbtimers', { kind: 'jjbtimers', list }); return list;
+}
+const saveRtPresets = list => Store.set('jjbtimers', { kind: 'jjbtimers', list });
+const RTS = (() => { try { return Object.assign({ sound: true, voice: true, countdown: true }, JSON.parse(localStorage.getItem('tc.rtset') || '{}')); } catch (e) { return { sound: true, voice: true, countdown: true }; } })();
+const saveRts = () => { try { localStorage.setItem('tc.rtset', JSON.stringify(RTS)); } catch (e) {} };
+const fmtT = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const fmtLongT = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60; if (h) return h + ' h ' + String(m).padStart(2, '0'); if (m >= 10) return Math.round(s / 60) + ' min'; if (!r) return m + ' min'; return m ? m + ' min ' + String(r).padStart(2, '0') : r + ' s'; };
+function rtPlan(p) {
+  const steps = [];
+  if (p.prep > 0) steps.push({ type: 'prep', d: p.prep, round: 1, set: 1 });
+  for (let s = 1; s <= p.sets; s++) for (let r = 1; r <= p.rounds; r++) {
+    steps.push({ type: 'work', d: p.work, round: r, set: s });
+    const lastR = r === p.rounds, lastS = s === p.sets;
+    if (!lastR && p.rest > 0) steps.push({ type: 'rest', d: p.rest, round: r, set: s });
+    if (lastR && !lastS && (p.setRest || p.rest) > 0) steps.push({ type: 'setrest', d: p.setRest || p.rest, round: r, set: s });
+  }
+  let t = 0; steps.forEach(st => { st.at = t; t += st.d; }); return { steps, total: t };
+}
+const RT_PH = { prep: { l: 'Prépare-toi', c: '#C98200' }, work: { l: 'Combat', c: '#17935A' }, rest: { l: 'Repos', c: '#D14343' }, setrest: { l: 'Repos série', c: '#6B4FD8' } };
+const rtWorkLabel = p => /drill|gainage|circuit|tabata/i.test(p.name) ? 'Travail' : 'Combat';
+function rtSummary(p) { const pl = rtPlan(p); return `<b>${p.rounds} × ${fmtT(p.work)}</b>${p.rest ? ' / ' + fmtT(p.rest) + ' repos' : ''}${p.sets > 1 ? ' · <b>' + p.sets + ' séries</b>' : ''} · ${fmtLongT(pl.total)}`; }
+function jjbTimerTab() {
+  const list = rtPresets();
+  const sw = (k, l, h) => `<button class="sw" data-a="rtSet" data-x="${k}"><span class="grow" style="text-align:left"><b>${l}</b><br><span class="mut small">${h}</span></span><span class="tg ${RTS[k] ? 'on' : ''}"></span></button>`;
+  return list.map(p => `<div class="card rtp"><span class="dot" style="background:${esc(p.color)}"></span><button class="grow" style="text-align:left;min-width:0" data-a="rtEdit" data-x="${p.id}"><h3>${esc(p.name)}</h3><div class="mut small">${rtSummary(p)}</div></button><button class="rtplay" data-a="rtStart" data-x="${p.id}" aria-label="Lancer ${esc(p.name)}">${IC.play}</button></div>`).join('') +
+  `<button class="btn pri full" data-a="rtNew">${IC.plus} Nouveau minuteur</button>
+  <span class="lbl">Signaux</span><div class="card" style="gap:4px">${sw('sound', 'Sons', 'Bips forts, la musique baisse pendant le signal')}${sw('voice', 'Voix', '« Round 3 », « Repos », « 10 secondes »')}${sw('countdown', 'Bips 3-2-1', 'Les 3 dernières secondes de chaque phase')}</div>
+  <div class="tip">Laisse l'appli ouverte pendant le combat : l'écran reste allumé. Si tu la quittes, le chrono continue et reprend où il en est quand tu reviens.</div>`;
+}
+function shRtEdit(s) {
+  const d = s.dr, pl = rtPlan(d);
+  const cmap = { prep: RT_PH.prep.c, work: RT_PH.work.c, rest: RT_PH.rest.c, setrest: RT_PH.setrest.c };
+  const f = (k, lb, hint, kind, color) => `<div class="rtf">${color ? `<span class="cb" style="background:${color}"></span>` : ''}<div class="grow"><b>${lb}</b>${hint ? `<br><span class="mut small">${hint}</span>` : ''}</div><div class="rtstep"><button data-step="${k}" data-dir="-1" aria-label="Moins">−</button><span class="v num">${kind === 't' ? (d[k] ? fmtT(d[k]) : 'Off') : d[k]}</span><button data-step="${k}" data-dir="1" aria-label="Plus">+</button></div></div>`;
+  return sheetHead(s.isNew ? 'Nouveau minuteur' : 'Modifier le minuteur') + `<input id="rt-nm" value="${esc(d.name)}" placeholder="Nom (ex. JJB 5 rounds)" maxlength="40" data-jin="name">
+  <div class="chips">${RT_COLORS.map(c => `<button class="rtcol ${c === d.color ? 'on' : ''}" style="background:${c}" data-a="rtColor" data-x="${c}" aria-label="Couleur"></button>`).join('')}</div>
+  <span class="lbl">Rounds</span>${f('work', 'Travail', 'Durée d\'un round', 't', cmap.work)}${f('rest', 'Repos', 'Entre deux rounds', 't', cmap.rest)}${f('rounds', 'Rounds', 'Par série', 'n')}
+  <span class="lbl">Séries</span>${f('sets', 'Séries', 'Combien de fois on répète les rounds', 'n')}${d.sets > 1 ? f('setRest', 'Repos entre séries', 'Pause plus longue', 't', cmap.setrest) : ''}
+  <span class="lbl">Signaux</span>${f('prep', 'Préparation', 'Avant le premier round', 't', cmap.prep)}${f('warn', 'Alerte avant la fin', 'Double bip + voix', 't')}
+  <div class="rttl">${pl.steps.map(st => `<i style="flex:${st.d};background:${cmap[st.type]}"></i>`).join('')}</div>
+  <div class="row sp"><span class="mut">Durée totale</span><b class="num" style="font-family:var(--fd);font-size:22px">${fmtLongT(pl.total)}</b></div>
+  <div class="grid2"><button class="btn" data-a="rtSave">Enregistrer</button><button class="btn acc" data-a="rtSave" data-x="start">${IC.play} Lancer</button></div>
+  ${s.isNew ? '' : `<div class="grid2"><button class="btn sm ghost" data-a="rtDup">Dupliquer</button><button class="btn sm danger" data-a="rtDel">Supprimer</button></div>`}`;
+}
+const RT_STEPS = { work: v => v < 60 ? 5 : v < 300 ? 15 : 30, rest: v => v < 60 ? 5 : v < 300 ? 15 : 30, setRest: v => v < 60 ? 5 : v < 300 ? 15 : 30, prep: () => 5, warn: v => v < 30 ? 5 : v < 60 ? 10 : 30, rounds: () => 1, sets: () => 1 };
+const RT_LIM = { work: [5, 3600], rest: [0, 1800], setRest: [0, 1800], prep: [0, 120], warn: [0, 600], rounds: [1, 50], sets: [1, 20] };
+function rtStepVal(dr, k, dir) {
+  const v = dr[k]; const inc = RT_STEPS[k](dir > 0 ? v : Math.max(0, v - 1));
+  let n = dir > 0 ? Math.floor(v / inc) * inc + inc : Math.ceil(v / inc) * inc - inc;
+  n = Math.max(RT_LIM[k][0], Math.min(RT_LIM[k][1], n)); if (n === v) return false; dr[k] = n; return true;
+}
+let rtHoldT = null, rtHoldI = null;
+const rtStopHold = () => { clearTimeout(rtHoldT); clearInterval(rtHoldI); rtHoldT = rtHoldI = null; };
+document.addEventListener('pointerdown', ev => {
+  const b = ev.target.closest('[data-step]'); if (!b || !UI.sheet || UI.sheet.t !== 'rtEdit') return; ev.preventDefault();
+  const k = b.dataset.step, dir = +b.dataset.dir;
+  const go = () => { if (rtStepVal(UI.sheet.dr, k, dir)) renderSheet(); };
+  go(); rtStopHold(); rtHoldT = setTimeout(() => { rtHoldI = setInterval(go, 90); }, 420);
+});
+['pointerup', 'pointercancel'].forEach(t => document.addEventListener(t, rtStopHold));
+
+// moteur
+let RTR = null, rtPl = null, rtLoop = null, rtLastIdx = -1, rtLastSec = null, rtLastWarn = -1, rtLastPaint = '';
+const rtEl = () => { let el = document.getElementById('rt-run'); if (!el) { el = document.createElement('div'); el.id = 'rt-run'; el.hidden = true; document.body.appendChild(el); el.addEventListener('click', rtClick); } return el; };
+const rtElapsed = () => RTR.base + (RTR.startedAt ? (Date.now() - RTR.startedAt) / 1000 : 0);
+const rtPersist = () => { try { if (RTR) localStorage.setItem('tc.rtrun', JSON.stringify(RTR)); else localStorage.removeItem('tc.rtrun'); } catch (e) {} };
+const rtStepAt = e => { const st = rtPl.steps; for (let i = st.length - 1; i >= 0; i--) if (e >= st[i].at) return i; return 0; };
+function rtTone(seq) {
+  if (!RTS.sound) return;
+  setAudioSession('transient'); unlockAudio(); clearTimeout(rtTone._t); rtTone._t = setTimeout(() => setAudioSession('auto'), 2600);
+  try {
+    if (!actx) return; if (!rtTone.m) { const comp = actx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 6; rtTone.m = actx.createGain(); rtTone.m.connect(comp); comp.connect(actx.destination); }
+    const t0 = actx.currentTime + 0.04;
+    seq.forEach(([at, f, dur, type, vol]) => { const t = t0 + at, o = actx.createOscillator(), g = actx.createGain(), v = vol || 0.9; o.type = type || 'square'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.012); g.gain.setValueAtTime(v, t + Math.max(0.02, dur - 0.04)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g).connect(rtTone.m); o.start(t); o.stop(t + dur + 0.02); });
+  } catch (e) {}
+}
+const rtBell = (n, gap) => { const seq = []; for (let i = 0; i < n; i++) [[880, 1], [1760, .5], [2640, .3]].forEach(([f, v]) => seq.push([i * gap, f, 0.9, 'triangle', v])); rtTone(seq); };
+const RT_SND = { tick: () => rtTone([[0, 1000, 0.12, 'square', 0.7]]), go: () => rtTone([[0, 1568, 0.55, 'square', 0.95], [0, 784, 0.55, 'square', 0.5]]), rest: () => rtBell(3, 0.32), setrest: () => rtBell(2, 0.5), warn: () => rtTone([[0, 1320, 0.09], [0.14, 1320, 0.09], [0.28, 1320, 0.09]]), done: () => rtBell(5, 0.3) };
+function rtSay(txt) { if (!RTS.voice || !RTS.sound || !('speechSynthesis' in window)) return; try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(txt); u.lang = 'fr-FR'; u.rate = 1.05; speechSynthesis.speak(u); } catch (e) {} }
+function rtStart(p) { unlockAudio(); RTR = { preset: JSON.parse(JSON.stringify(p)), base: 0, startedAt: Date.now() }; rtPl = rtPlan(RTR.preset); rtLastIdx = -1; rtLastSec = null; rtLastWarn = -1; rtPersist(); rtOpen(); }
+function rtOpen() { const el = rtEl(); el.hidden = false; document.body.style.overflow = 'hidden'; requestWake(); rtShell(); rtTick(true); clearInterval(rtLoop); rtLoop = setInterval(rtTick, 100); }
+function rtClose() { clearInterval(rtLoop); rtLoop = null; RTR = null; rtPl = null; rtPersist(); try { speechSynthesis.cancel(); } catch (e) {} const el = rtEl(); el.hidden = true; el.innerHTML = ''; document.body.style.overflow = ''; render(); }
+function rtPause() { unlockAudio(); if (!RTR || RTR.finished) return; if (RTR.startedAt) { RTR.base = rtElapsed(); RTR.startedAt = null; } else { RTR.startedAt = Date.now(); requestWake(); } rtPersist(); rtTick(true); }
+function rtSeek(e) { RTR.base = Math.max(0, Math.min(e, rtPl.total)); if (RTR.startedAt) RTR.startedAt = Date.now(); rtLastSec = null; rtPersist(); rtTick(); }
+function rtSkip() { unlockAudio(); if (!RTR || RTR.finished) return; const i = rtStepAt(rtElapsed()); if (i < rtPl.steps.length - 1) rtSeek(rtPl.steps[i + 1].at); else rtFinish(); }
+function rtPrev() { unlockAudio(); if (!RTR) return; if (RTR.finished) { RTR.finished = false; RTR.startedAt = null; } const e = Math.min(rtElapsed(), rtPl.total - 0.01), i = rtStepAt(e), st = rtPl.steps[i]; rtSeek(e - st.at > 2 || i === 0 ? st.at : rtPl.steps[i - 1].at); }
+function rtFlash() { const el = rtEl(); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1600); }
+function rtFinish() { RTR.base = rtPl.total; RTR.startedAt = null; RTR.finished = true; rtPersist(); RT_SND.done(); rtSay('Terminé, bien joué'); rtFlash(); rtShell(); }
+function rtAnnounce(st, i) {
+  const p = RTR.preset, last = st.type === 'work' && st.round === p.rounds;
+  if (st.type === 'work') { RT_SND.go(); if (p.rounds > 1) rtSay(last ? (st.set === p.sets ? 'Dernier round' : 'Dernier round de la série') : 'Round ' + st.round); }
+  else if (st.type === 'rest') { RT_SND.rest(); rtSay('Repos'); }
+  else if (st.type === 'setrest') { RT_SND.setrest(); rtSay('Série ' + st.set + ' terminée. Repos'); }
+  else if (st.type === 'prep') rtSay('Prépare-toi');
+  if (i > 0) rtFlash();
+}
+function rtTick(force) {
+  if (!RTR) return;
+  const e = rtElapsed();
+  if (!RTR.finished && e >= rtPl.total) { rtFinish(); return; }
+  if (RTR.finished) return;
+  const i = rtStepAt(e), st = rtPl.steps[i], left = st.at + st.d - e, sec = Math.ceil(left - 0.001);
+  if (i !== rtLastIdx) { rtAnnounce(st, i); rtLastIdx = i; rtLastWarn = -1; rtShell(); }
+  else if (RTR.startedAt && sec !== rtLastSec) {
+    const p = RTR.preset;
+    if (st.type === 'work' && p.warn > 0 && sec === p.warn && st.d > p.warn + 3 && rtLastWarn !== i) { rtLastWarn = i; RT_SND.warn(); rtSay(p.warn >= 60 ? (p.warn / 60) + ' minute' + (p.warn >= 120 ? 's' : '') : p.warn + ' secondes'); }
+    else if (RTS.countdown && sec >= 1 && sec <= 3 && st.d >= 5 && rtLastSec !== null) RT_SND.tick();
+  }
+  rtLastSec = sec; rtPaint(e, i, st, left, force);
+}
+function rtShell() {
+  const el = rtEl(), p = RTR.preset;
+  el.classList.toggle('paused', !RTR.startedAt && !RTR.finished);
+  if (RTR.finished) {
+    el.style.setProperty('--phase', '#15171B');
+    el.innerHTML = `<div class="rtop"><div class="nm">${esc(p.name)}</div><button class="rib" data-r="close" aria-label="Fermer">${IC.x || '×'}</button></div><div class="rmid"><div class="done-ttl">Terminé</div><div class="next">${p.rounds * p.sets} rounds · ${fmtLongT(rtPl.total)}</div>${getDay(today()).jjb ? '' : `<button class="rbtn" data-r="jjbdone">Noter mon JJB du jour</button>`}</div><div class="rctl"><button data-r="prev" aria-label="Revenir">${RT_IC.prev}</button><button class="big" data-r="again" aria-label="Recommencer">${RT_IC.play}</button><button data-r="close" aria-label="Fermer">${RT_IC.close}</button></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="rtop"><button class="rib" data-r="stop" aria-label="Arrêter">${RT_IC.close}</button><div class="nm">${esc(p.name)}</div><button class="rib" data-r="sound" aria-label="Son" style="opacity:${RTS.sound ? 1 : .45}">${RT_IC.sound}</button></div>
+  <div class="rmid"><div class="phase" id="rphase"></div><div class="clock" id="rclock" data-r="pause">0:00</div><div class="counts" id="rcounts"></div><div class="next" id="rnext"></div><div class="rconf" id="rconf" hidden><b>Arrêter le minuteur ?</b><div class="row"><button class="rbtn" data-r="stopyes">Arrêter</button><button class="rbtn" data-r="stopno">Continuer</button></div></div></div>
+  <div class="pbar"><i id="rbar"></i></div><div class="rinfo"><span id="rel"></span><span id="rrem"></span></div>
+  <div class="rctl"><button data-r="prev" aria-label="Précédent">${RT_IC.prev}</button><button class="big" data-r="pause" id="rpp" aria-label="Pause">${RT_IC.pause}</button><button data-r="skip" aria-label="Suivant">${RT_IC.next}</button></div>`;
+  rtLastPaint = '';
+}
+function rtPaint(e, i, st, left, force) {
+  const p = RTR.preset, sec = Math.ceil(left - 0.001), key = i + '|' + sec + '|' + !!RTR.startedAt;
+  const bar = document.getElementById('rbar'); if (!bar) return;
+  bar.style.width = (100 * Math.min(1, (e - st.at) / st.d)).toFixed(2) + '%';
+  if (key === rtLastPaint && !force) return; rtLastPaint = key;
+  const el = rtEl(); el.style.setProperty('--phase', RT_PH[st.type].c); el.classList.toggle('paused', !RTR.startedAt);
+  $('#rphase').textContent = st.type === 'work' ? rtWorkLabel(p) : RT_PH[st.type].l;
+  $('#rclock').textContent = fmtT(sec);
+  $('#rcounts').innerHTML = `<span class="rpill"><small>Round</small> ${st.type === 'prep' ? 0 : st.round}/${p.rounds}</span>` + (p.sets > 1 ? `<span class="rpill"><small>Série</small> ${st.set}/${p.sets}</span>` : '');
+  const nx = rtPl.steps[i + 1];
+  $('#rnext').textContent = nx ? 'Ensuite : ' + (nx.type === 'work' ? rtWorkLabel(p) : RT_PH[nx.type].l) + ' ' + fmtT(nx.d) : 'Dernière ligne droite';
+  $('#rel').textContent = fmtT(e); $('#rrem').textContent = '-' + fmtT(rtPl.total - e);
+  $('#rpp').innerHTML = RTR.startedAt ? RT_IC.pause : RT_IC.play;
+}
+function rtClick(ev) {
+  const b = ev.target.closest('[data-r]'); if (!b) return; const a = b.dataset.r;
+  if (a === 'pause') rtPause(); else if (a === 'skip') rtSkip(); else if (a === 'prev') rtPrev();
+  else if (a === 'sound') { RTS.sound = !RTS.sound; saveRts(); b.style.opacity = RTS.sound ? 1 : .45; }
+  else if (a === 'close') rtClose(); else if (a === 'again') rtStart(RTR.preset);
+  else if (a === 'stop') { const c = $('#rconf'); if (c) c.hidden = false; }
+  else if (a === 'stopno') { const c = $('#rconf'); if (c) c.hidden = true; }
+  else if (a === 'stopyes') rtClose();
+  else if (a === 'jjbdone') { const d = getDay(today()); d.jjb = true; saveDay(d); toast('JJB noté. Pense au shake.'); b.remove(); }
+}
+const RT_IC = {
+  play: '<svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" fill="currentColor" width="34" height="34"><rect x="5.5" y="4" width="4.5" height="16" rx="1.2"/><rect x="14" y="4" width="4.5" height="16" rx="1.2"/></svg>',
+  next: '<svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><path d="M5 5.5v13a1 1 0 0 0 1.55.83L16 13v5a1 1 0 0 0 2 0V6a1 1 0 0 0-2 0v5L6.55 4.67A1 1 0 0 0 5 5.5z"/></svg>',
+  prev: '<svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><path d="M19 5.5v13a1 1 0 0 1-1.55.83L8 13v5a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5l9.45-6.33A1 1 0 0 1 19 5.5z"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" width="22" height="22"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+};
+function rtResume() {
+  let r = null; try { r = JSON.parse(localStorage.getItem('tc.rtrun') || 'null'); } catch (e) {}
+  if (!r || !r.preset) return;
+  RTR = r; rtPl = rtPlan(RTR.preset);
+  if (RTR.finished || rtElapsed() >= rtPl.total + 600) { RTR = null; rtPl = null; rtPersist(); return; }
+  rtLastIdx = rtStepAt(Math.min(rtElapsed(), rtPl.total - 0.01)); rtOpen();
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && RTR) { if (RTR.startedAt) requestWake(); unlockAudio(); rtTick(true); } if (document.hidden && RTR) rtPersist(); });
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset && t.dataset.jin && UI.sheet && UI.sheet.dr) UI.sheet.dr[t.dataset.jin] = t.value;
+  if (t.dataset && t.dataset.jq) { UI.jtq = t.value; const pos = t.selectionStart; render(); const q = $('#jt-q'); if (q) { q.focus(); try { q.setSelectionRange(pos, pos); } catch (x) {} } }
+});
+
+/* --- actions --- */
+async function jjbUpload(f) { if (f.size > 60 * 1024 * 1024) { toast('Vidéo trop lourde (60 Mo max). Coupe-la un peu.'); return null; } const isV = f.type.startsWith('video'); const blob = isV ? f : await shrinkImage(f, 1600); const r = await Caps.assets.upload(blob); return { id: r.id, type: isV ? 'video' : 'image' }; }
+function jjbOwner(x) {
+  const [k, id] = [x.slice(0, 2), x.slice(3)];
+  if (k === 'th') { const d = jjbData(), t = d.themes.find(z => z.id === id); return t && { list: t.media, save: () => saveJjb(d) }; }
+  const t = Store.get(id); if (!t) return null; const c = JSON.parse(JSON.stringify(t)); return { list: c.media, save: () => Store.set(id, c) };
+}
+Object.assign(A, {
+  jjbTab: x => { UI.jjbTab = x; saveUI(); render(); },
+  jjbTheme: x => openSheet({ t: 'jjbTheme', id: x }),
+  jjbThemeEdit: () => { const t = jjbData().themes.find(z => z.id === UI.sheet.id); UI.sheet.edit = true; UI.sheet.dr = { n: t.n, target: String(t.target), score: String(t.score), note: t.note, mv: t.moves.map(m => m.n + ' +' + m.p).join('\n'), lk: t.links.join('\n') }; renderSheet(); },
+  jjbThemeNew: () => { const d = jjbData(); const t = { id: 't' + newId(), n: '', st: 'fut', target: 30, score: 0, moves: [], note: '', links: [], media: [], log: [] }; d.themes.push(t); saveJjb(d); openSheet({ t: 'jjbTheme', id: t.id, edit: true, isNew: true, dr: { n: '', target: '30', score: '0', note: '', mv: '', lk: '' } }); },
+  jjbThemeSave: () => {
+    const s = UI.sheet, dr = s.dr, d = jjbData(), t = d.themes.find(z => z.id === s.id); if (!t) return;
+    if (!dr.n.trim()) { toast('Donne un nom au thème.'); return; }
+    t.n = dr.n.trim(); t.target = Math.max(1, r0(num(dr.target) || 30)); t.score = num(dr.score) || 0; t.note = dr.note.trim();
+    t.moves = dr.mv.split('\n').map(l => l.trim()).filter(Boolean).map(l => { const m = l.match(/^(.*?)\s*\+\s*(\d+(?:[.,]\d+)?)\s*(?:pts?|points?)?$/i); return m ? { n: m[1].trim(), p: num(m[2]) } : { n: l, p: 1 }; });
+    t.links = dr.lk.split(/\s+/).filter(u => /^https?:\/\//.test(u));
+    saveJjb(d); openSheet({ t: 'jjbTheme', id: t.id }); render();
+  },
+  jjbThemeDel: () => { const d = jjbData(); d.themes = d.themes.filter(z => z.id !== UI.sheet.id); saveJjb(d); closeSheet(); render(); },
+  jjbThemeSt: x => { const d = jjbData(), t = d.themes.find(z => z.id === UI.sheet.id); t.st = x; saveJjb(d); toast(x === 'done' ? 'Thème validé. Bien joué.' : x === 'cur' ? 'Thème repris.' : 'Remis dans les futurs thèmes.'); renderSheet(); render(); },
+  jjbStart: x => { const d = jjbData(), t = d.themes.find(z => z.id === x); t.st = 'cur'; saveJjb(d); const n = d.themes.filter(z => z.st === 'cur').length; toast(n > 5 ? `${n} thèmes en cours : ta règle dit 5 max par bloc.` : 'Thème démarré. Objectif ' + t.target + ' points.'); if (UI.sheet) closeSheet(); UI.jjbTab = 'themes'; render(); },
+  jjbPlace: x => openSheet({ t: 'jjbPlace', id: x }),
+  jjbLog: (o, i) => {
+    const d = jjbData(), t = d.themes.find(z => z.id === UI.sheet.id); const m = t.moves[+i] || { n: '', p: 1 };
+    const p = m.p * (o === 'good' ? d.pts.good : d.pts.white);
+    t.score = r1(t.score + p); t.log.push({ d: today(), m: m.n, o, p });
+    const day = getDay(today()); if (!day.jjb) { day.jjb = true; saveDay(day); }
+    saveJjb(d); closeSheet(); toast(`+${fr(p)} sur ${t.n} (${fr(t.score)}/${t.target})${t.score >= t.target ? '. Objectif atteint !' : ''}`); render();
+  },
+  jjbUndo: () => { const d = jjbData(), t = d.themes.find(z => z.id === UI.sheet.id); const l = t.log.pop(); if (l) t.score = r1(t.score - l.p); saveJjb(d); renderSheet(); render(); },
+  jjbSpec: x => openSheet({ t: 'jjbSpec', id: x }),
+  jjbSpecNew: () => openSheet({ t: 'jjbSpec', id: null }),
+  jjbSpecSave: () => { const d = jjbData(), n = $('#js-n').value.trim(), note = $('#js-nt').value.trim(); if (!n) { toast('Donne un nom.'); return; } let sp = d.spec.find(z => z.id === UI.sheet.id); if (!sp) { sp = { id: 's' + newId(), ok: 0 }; d.spec.push(sp); } sp.n = n; sp.note = note; saveJjb(d); closeSheet(); render(); },
+  jjbSpecDel: () => { const d = jjbData(); d.spec = d.spec.filter(z => z.id !== UI.sheet.id); saveJjb(d); closeSheet(); render(); },
+  jjbSpecOk: x => { const d = jjbData(), sp = d.spec.find(z => z.id === x); sp.ok = (sp.ok || 0) + 1; saveJjb(d); toast(sp.n + ' : réussi ' + sp.ok + ' fois'); render(); },
+  jjbMethod: () => openSheet({ t: 'jjbMethod' }),
+  jjbMethodSave: () => { const d = jjbData(); d.method = $('#jm-t').value.trim(); d.pts = { good: num($('#jm-g').value) || 2, white: num($('#jm-w').value) || 1 }; d.links = $('#jm-l').value.split('\n').map(l => l.split('|').map(x => x.trim())).filter(([t, u]) => u && /^https?:\/\//.test(u)).map(([t, u]) => ({ t: t || hostOf(u), u })); saveJjb(d); closeSheet(); render(); },
+  jjbCat: x => { UI.jtcat = x; render(); },
+  jjbTech: x => openSheet({ t: 'jjbTech', id: x }),
+  jjbTechNew: () => openSheet({ t: 'jjbTech', id: null, edit: true, dr: { n: '', cat: UI.jtcat || 'Passages', body: '', lk: '' } }),
+  jjbTechEdit: () => { const t = Store.get(UI.sheet.id); UI.sheet.edit = true; UI.sheet.dr = { n: t.n, cat: t.cat, body: t.body, lk: (t.links || []).join('\n') }; renderSheet(); },
+  jjbTechCat: x => { UI.sheet.dr.cat = x; renderSheet(); },
+  jjbTechSave: () => {
+    const s = UI.sheet, dr = s.dr; if (!dr.n.trim()) { toast('Donne un nom à la technique.'); return; }
+    const id = s.id || 'jt-' + newId(); const old = s.id ? Store.get(s.id) : null;
+    Store.set(id, Object.assign({ kind: 'jtech', media: [], status: 'learn', ph: 0 }, old || {}, { n: dr.n.trim(), cat: dr.cat, body: dr.body, links: dr.lk.split(/\s+/).filter(u => /^https?:\/\//.test(u)), up: Date.now() }));
+    openSheet({ t: 'jjbTech', id }); render();
+  },
+  jjbTechDel: async () => { const t = Store.get(UI.sheet.id); Store.del(UI.sheet.id); for (const m of (t && t.media) || []) try { Caps.assets && await Caps.assets.delete(m.id); } catch (e) {} closeSheet(); render(); },
+  jjbTechSt: x => { const t = Object.assign({}, Store.get(UI.sheet.id)); t.status = x; Store.set(UI.sheet.id, t); renderSheet(); render(); },
+  jjbMediaAdd: x => { if (!Caps.assets) { toast('Photos indisponibles ici.'); return; } pickFile('image/*,video/*', async f => { toast('Ajout…'); try { const m = await jjbUpload(f); if (!m) return; const o = jjbOwner(x); if (!o) return; o.list.push(m); o.save(); if (x.startsWith('tk:')) { const t = Object.assign({}, Store.get(x.slice(3))); if (t.ph) { t.ph = Math.max(0, t.ph - 1); Store.set(x.slice(3), Object.assign(t, { media: o.list })); } } toast(m.type === 'video' ? 'Vidéo ajoutée' : 'Photo ajoutée'); renderSheet(); render(); } catch (e) { toast('Ajout impossible : ' + (e && e.code === 'quota_exceeded' ? 'stockage plein.' : 'réessaie.')); } }); },
+  jjbMediaDel: async (x, i) => { const o = jjbOwner(x); if (!o) return; const [m] = o.list.splice(+i, 1); o.save(); try { m && Caps.assets && await Caps.assets.delete(m.id); } catch (e) {} renderSheet(); render(); },
+  jjbZoom: x => openSheet({ t: 'jjbZoom', id: x }),
+  rtStart: x => { const p = rtPresets().find(z => z.id === x); if (p) rtStart(p); },
+  rtNew: () => { const n = rtPresets().length; openSheet({ t: 'rtEdit', isNew: true, dr: { id: 'p' + newId(), name: '', prep: 10, work: 300, rest: 60, rounds: 5, sets: 1, setRest: 120, warn: 10, color: RT_COLORS[n % RT_COLORS.length] } }); },
+  rtEdit: x => { const p = rtPresets().find(z => z.id === x); if (p) openSheet({ t: 'rtEdit', dr: p }); },
+  rtColor: x => { UI.sheet.dr.color = x; renderSheet(); },
+  rtSave: x => { const dr = UI.sheet.dr; if (!String(dr.name).trim()) dr.name = `${dr.rounds} × ${fmtT(dr.work)}`; const list = rtPresets(); const i = list.findIndex(z => z.id === dr.id); if (i >= 0) list[i] = dr; else list.push(dr); saveRtPresets(list); closeSheet(); render(); if (x === 'start') rtStart(dr); else toast('Minuteur enregistré'); },
+  rtDup: () => { const list = rtPresets(); const c = Object.assign({}, UI.sheet.dr, { id: 'p' + newId(), name: UI.sheet.dr.name + ' (copie)' }); list.push(c); saveRtPresets(list); closeSheet(); render(); toast('Copie créée'); },
+  rtDel: () => { saveRtPresets(rtPresets().filter(z => z.id !== UI.sheet.dr.id)); closeSheet(); render(); toast('Minuteur supprimé'); },
+  rtSet: x => { RTS[x] = !RTS[x]; saveRts(); if (x === 'sound' && RTS.sound) { unlockAudio(); RT_SND.go(); } render(); },
+});
+const XSHEETS = { jjbTheme: shJjbTheme, jjbPlace: shJjbPlace, jjbSpec: shJjbSpec, jjbMethod: shJjbMethod, jjbTech: shJjbTech, jjbZoom: shJjbZoom, rtEdit: shRtEdit };
+
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-a]'); if (!b) return;
   const fn = A[b.dataset.a]; if (!fn) return;
@@ -1741,6 +2273,7 @@ Store.load();
 render();
 if (active() && UI.tab) { /* séance en cours : bannière visible, reprise en un tap */ }
 connect();
+setTimeout(() => { try { rtResume(); } catch (e) {} }, 300);
 setInterval(() => { if (!UI.sheet && $('#session').hidden) scheduleRender(); }, 60000);
 </script>
 </body></html>
