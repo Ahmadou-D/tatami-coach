@@ -702,6 +702,34 @@ const LocalAssets = {
   async upload(blob) { const id = 'l' + newId(); const db = await this.open(); await new Promise((res, rej) => { const tx = db.transaction('blobs', 'readwrite'); tx.objectStore('blobs').put(blob, id); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); return { id, url: '' }; },
   async get(id) { const db = await this.open(); return new Promise(res => { const rq = db.transaction('blobs').objectStore('blobs').get(id); rq.onsuccess = () => res(rq.result || null); rq.onerror = () => res(null); }); },
   async delete(id) { const db = await this.open(); await new Promise(res => { const tx = db.transaction('blobs', 'readwrite'); tx.objectStore('blobs').delete(id); tx.oncomplete = res; tx.onerror = res; }); },
+  async keys() { const db = await this.open(); return new Promise(res => { const rq = db.transaction('blobs').objectStore('blobs').getAllKeys(); rq.onsuccess = () => res(rq.result || []); rq.onerror = () => res([]); }); },
+  async put(id, blob) { const db = await this.open(); await new Promise((res, rej) => { const tx = db.transaction('blobs', 'readwrite'); tx.objectStore('blobs').put(blob, id); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); },
+};
+/* Sauvegarde médias : 'TATAMIM1' + taille de l'en-tête (4 octets) + en-tête JSON + fichiers à la suite */
+const MediaBackup = {
+  MAGIC: 'TATAMIM1',
+  async build() {
+    const ids = await LocalAssets.keys(), items = [], parts = [];
+    for (const id of ids) { const b = await LocalAssets.get(id); if (!b || !b.size) continue; items.push({ id: String(id), type: b.type || '', size: b.size }); parts.push(b); }
+    const head = new TextEncoder().encode(JSON.stringify({ app: 'tatami-coach', v: 1, exported: new Date().toISOString(), items }));
+    const len = new Uint8Array(4); new DataView(len.buffer).setUint32(0, head.length);
+    return { blob: new Blob([this.MAGIC, len, head, ...parts], { type: 'application/octet-stream' }), n: items.length, bytes: parts.reduce((a, b) => a + b.size, 0) };
+  },
+  async read(file) {
+    const pre = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+    if (new TextDecoder().decode(pre.slice(0, 8)) !== this.MAGIC) throw 0;
+    const hl = new DataView(pre.buffer).getUint32(8);
+    const h = JSON.parse(new TextDecoder().decode(await file.slice(12, 12 + hl).arrayBuffer()));
+    if (!h || h.app !== 'tatami-coach' || !Array.isArray(h.items)) throw 0;
+    let off = 12 + hl, n = 0;
+    for (const it of h.items) {
+      if (!/^[A-Za-z0-9_.~:@+-]{1,180}$/.test(it.id) || !(it.size > 0) || off + it.size > file.size) throw 0;
+      await LocalAssets.put(it.id, file.slice(off, off + it.size, it.type || ''));
+      if (blobUrls[it.id]) { URL.revokeObjectURL(blobUrls[it.id]); delete blobUrls[it.id]; }
+      off += it.size; n++;
+    }
+    return n;
+  },
 };
 const blobUrls = {};
 const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
@@ -714,8 +742,8 @@ async function hydrateBlobs() {
   }
 }
 const LocalDownloads = {
-  async save({ filename, data }) {
-    const file = new File([data], filename, { type: 'application/json' });
+  async save({ filename, data, type }) {
+    const file = new File([data], filename, { type: type || 'application/json' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: filename }); return; }
     const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
   },
@@ -1248,7 +1276,7 @@ function viewMore() {
     ${[['kcal', 'Calories (kcal)'], ['p', 'Protéines (g)'], ['c', 'Glucides (g)'], ['f', 'Lipides (g)'], ['minProt', 'Minimum protéines (g)'], ['cat', 'Catégorie (kg)']].map(([k, l]) => `<div class="field"><label for="p-${k}">${l}</label><input id="p-${k}" inputmode="decimal" value="${esc(p[k])}"></div>`).join('')}
   </div><button class="btn pri full" data-a="saveGoals">Enregistrer les objectifs</button></div>
   ${IS_ARTIFACT ? '' : standaloneSettings()}
-  <div class="card"><h2>Mes données</h2><div class="mut small">${IS_ARTIFACT ? 'Elles sont enregistrées sur ton compte Claude, dans un espace privé que toi seul peux lire.' : 'Elles sont enregistrées uniquement sur ce téléphone. Exporte une copie de temps en temps (iCloud Drive, Fichiers).'} L'export te donne une copie complète.</div><div class="grid2"><button class="btn" data-a="export" ${Caps.downloads ? '' : 'disabled'}>Exporter (JSON)</button><button class="btn" data-a="import">Importer</button></div></div>`;
+  <div class="card"><h2>Mes données</h2><div class="mut small">${IS_ARTIFACT ? 'Elles sont enregistrées sur ton compte Claude, dans un espace privé que toi seul peux lire.' : 'Elles sont enregistrées uniquement sur ce téléphone. Exporte une copie de temps en temps (iCloud Drive, Fichiers).'} L'export te donne une copie complète.</div><div class="grid2"><button class="btn" data-a="export" ${Caps.downloads ? '' : 'disabled'}>Exporter (JSON)</button><button class="btn" data-a="import">Importer</button></div>${IS_ARTIFACT ? '' : `<h3 style="margin-top:14px">Photos et vidéos</h3><div class="mut small">Elles ne sont pas dans l'export JSON. Fais une sauvegarde à part de temps en temps, surtout avant de changer de téléphone. La restauration remet chaque média à sa place dans tes notes (importe d'abord le JSON).</div><div class="grid2"><button class="btn" data-a="mediaExport">Sauvegarder les médias</button><button class="btn" data-a="mediaImport">Restaurer les médias</button></div>`}</div>`;
 }
 
 function standaloneSettings() {
@@ -1819,6 +1847,20 @@ const A = {
   export: async () => { if (!Caps.downloads) return; try { await Caps.downloads.save({ filename: `tatami-coach-${today()}.json`, data: JSON.stringify({ app: 'tatami-coach', v: 1, exported: new Date().toISOString(), docs: Store.docs }, null, 1) }); lsSet('tc.lastExport', String(Date.now())); toast('Sauvegarde faite. Prochain rappel dans un mois.'); render(); } catch (e) { if (e && e.code !== 'cancelled' && e.code !== 'declined') toast('Export impossible.'); } },
   exportLater: () => { lsSet('tc.exportSnooze', String(Date.now() + 3 * 864e5)); render(); },
   import: () => openSheet({ t: 'import' }),
+  mediaExport: async () => {
+    try {
+      toast('Préparation des médias…');
+      const r = await MediaBackup.build();
+      if (!r.n) { toast('Aucune photo ni vidéo à sauvegarder.'); return; }
+      await LocalDownloads.save({ filename: `tatami-medias-${today()}.tatami`, data: r.blob, type: 'application/octet-stream' });
+      lsSet('tc.lastMediaExport', String(Date.now()));
+      toast(`${r.n} médias sauvegardés (${Math.max(1, Math.round(r.bytes / 1048576))} Mo).`);
+    } catch (e) { if (!e || (e.name !== 'AbortError' && e.code !== 'cancelled')) toast('Sauvegarde des médias impossible.'); }
+  },
+  mediaImport: () => pickFile('', async f => {
+    try { toast('Restauration…'); const n = await MediaBackup.read(f); toast(`${n} médias restaurés.`); render(); }
+    catch (e) { toast('Ce fichier n\'est pas une sauvegarde de médias Tatami Coach.'); }
+  }),
   keySave: () => { const v = ($('#api-key').value || '').trim(); if (!/^sk-ant-/.test(v)) { toast('Ça ne ressemble pas à une clé Anthropic (sk-ant-…).'); return; } try { localStorage.setItem('tc.apikey', v); } catch (e) {} Caps.sample = ApiSample; Caps.imgOk = true; toast('Clé enregistrée'); render(); },
   keyDel: () => { try { localStorage.removeItem('tc.apikey'); } catch (e) {} Caps.sample = null; Caps.imgOk = false; render(); },
   pushOn: async () => {
