@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Round Timer</title>
+<meta name="description" content="Timer d'intervalles gratuit : rounds, travail, repos, séries.">
+<meta name="theme-color" content="#0D1015">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Round Timer">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0D1015; --s1:#151A21; --s2:#1C222B; --s3:#262E39; --line:#2A323E;
+  --fg:#EEF1F5; --mut:#8C96A5; --acc:#8FB3FF; --acc-ink:#0B1220;
+  --work:#2FBF71; --rest:#E5484D; --prep:#F5A524; --setrest:#7C6CF2; --done:#8FB3FF;
+  --fh:'Archivo',system-ui,sans-serif; --fb:'Inter',system-ui,sans-serif;
+  --top:env(safe-area-inset-top,0px); --bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--fb);font-size:16px;line-height:1.4;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation}
+input{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;padding:calc(var(--top) + 18px) 16px calc(var(--bot) + 110px)}
+h1{font-family:var(--fh);font-weight:800;font-size:30px;letter-spacing:-.02em;margin:4px 0 2px}
+.sub{color:var(--mut);font-size:14px;margin:0 0 18px}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:18px;padding:14px 14px 14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.card .info{flex:1;min-width:0}
+.card .nm{font-family:var(--fh);font-weight:600;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .meta{color:var(--mut);font-size:13.5px;margin-top:2px}
+.card .meta b{color:var(--fg);font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.ib{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--s2);flex:none}
+.ib svg{width:22px;height:22px}
+.play{background:var(--work);color:#04140B}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:16px;background:var(--s2);font-weight:600;width:100%}
+.btn.pri{background:var(--acc);color:var(--acc-ink)}
+.btn.danger{background:transparent;color:var(--rest);border:1px solid #4a2427}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bot) + 18px);width:min(528px,calc(100% - 32px));z-index:5}
+.row2{display:flex;gap:10px}
+.sec{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:22px 4px 8px;font-weight:600}
+.tip{background:var(--s1);border:1px dashed var(--line);border-radius:14px;padding:12px 14px;color:var(--mut);font-size:13.5px;margin-top:14px}
+.tip b{color:var(--fg)}
+
+/* editeur */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.top .t{flex:1;font-family:var(--fh);font-weight:600;font-size:18px}
+.namein{width:100%;background:var(--s1);border:1px solid var(--line);border-radius:14px;height:52px;padding:0 14px;font-size:18px;font-family:var(--fh);font-weight:600;outline:none;-webkit-user-select:text;user-select:text}
+.namein:focus{border-color:var(--acc)}
+.field{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:10px 10px 10px 14px;display:flex;align-items:center;gap:10px;margin-top:8px}
+.field .lb{flex:1;min-width:0}
+.field .lb div:first-child{font-weight:600}
+.field .lb div+div{color:var(--mut);font-size:12.5px}
+.field .bar{width:4px;align-self:stretch;border-radius:4px;flex:none}
+.step{display:flex;align-items:center;gap:4px}
+.step button{width:46px;height:46px;border-radius:13px;background:var(--s2);font-size:24px;font-weight:500;line-height:1}
+.step button:active{background:var(--s3)}
+.step .v{min-width:74px;text-align:center;font-family:var(--fh);font-weight:600;font-size:22px;font-variant-numeric:tabular-nums}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin:18px 4px 0;color:var(--mut)}
+.total b{font-family:var(--fh);font-size:24px;color:var(--fg)}
+.colors{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.colors button{width:36px;height:36px;border-radius:50%;border:3px solid transparent}
+.colors button.on{border-color:var(--fg)}
+.tl{display:flex;height:10px;border-radius:6px;overflow:hidden;gap:2px;margin:14px 2px 0}
+.tl i{display:block;height:100%}
+
+/* reglages */
+.sw{display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:8px}
+.sw .lb{flex:1}
+.sw .lb div+div{color:var(--mut);font-size:12.5px}
+.tg{width:52px;height:32px;border-radius:20px;background:var(--s3);position:relative;flex:none;transition:background .2s}
+.tg::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .2s}
+.tg.on{background:var(--work)}
+.tg.on::after{transform:translateX(20px)}
+
+/* minuteur en cours */
+#run{position:fixed;inset:0;background:var(--phase,var(--prep));color:#fff;display:flex;flex-direction:column;z-index:20;transition:background .35s}
+#run::after{content:"";position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#run.flash::after{animation:fl .5s ease-out 3}
+@keyframes fl{0%{opacity:.75}100%{opacity:0}}
+.rtop{padding:calc(var(--top) + 12px) 16px 0;display:flex;align-items:center;gap:10px}
+.rtop .nm{flex:1;font-weight:600;font-size:15px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rib{width:44px;height:44px;border-radius:14px;background:rgba(0,0,0,.18);display:grid;place-items:center;flex:none}
+.rib svg{width:22px;height:22px}
+.rmid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 12px;min-height:0}
+.phase{font-family:var(--fh);font-weight:800;font-size:clamp(28px,8vw,46px);letter-spacing:.06em;text-transform:uppercase}
+.clock{font-family:var(--fh);font-weight:800;font-size:clamp(96px,31vw,220px);line-height:.95;font-variant-numeric:tabular-nums;letter-spacing:-.03em;margin:6px 0 10px}
+.counts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pill{background:rgba(0,0,0,.2);border-radius:999px;padding:8px 16px;font-weight:600;font-size:clamp(16px,4.6vw,20px)}
+.pill small{opacity:.75;font-weight:500}
+.next{margin-top:16px;opacity:.85;font-size:15px}
+.pbar{height:8px;margin:0 16px;background:rgba(0,0,0,.22);border-radius:6px;overflow:hidden}
+.pbar i{display:block;height:100%;background:rgba(255,255,255,.9);width:0}
+.rinfo{display:flex;justify-content:space-between;padding:8px 18px 0;font-size:13.5px;opacity:.85;font-variant-numeric:tabular-nums}
+.rctl{display:flex;align-items:center;justify-content:center;gap:22px;padding:18px 16px calc(var(--bot) + 22px)}
+.rctl button{width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.2);display:grid;place-items:center}
+.rctl button svg{width:28px;height:28px}
+.rctl .big{width:92px;height:92px;background:#fff;color:#111}
+.rctl .big svg{width:38px;height:38px}
+#run.paused .clock{animation:blink 1.2s steps(2,start) infinite}
+@keyframes blink{to{opacity:.35}}
+.done-ttl{font-family:var(--fh);font-weight:800;font-size:44px}
+.landscape-hint{display:none}
+@media (orientation:landscape) and (max-height:500px){
+  .clock{font-size:min(34vh,26vw);margin:0 0 4px}
+  .pill{padding:4px 12px;font-size:15px}
+  .phase{font-size:24px}
+  .rctl{padding-top:6px;padding-bottom:calc(var(--bot) + 8px)}
+  .rctl button{width:52px;height:52px}.rctl .big{width:68px;height:68px}
+  .next{display:none}
+}
+.toast{position:fixed;left:50%;bottom:calc(var(--bot) + 90px);transform:translateX(-50%);background:var(--s3);padding:10px 16px;border-radius:12px;font-size:14px;z-index:50;opacity:0;transition:opacity .25s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+.toast.on{opacity:1}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--s1);border-radius:22px 22px 0 0;width:100%;max-width:560px;padding:18px 16px calc(var(--bot) + 18px)}
+.sheet h3{font-family:var(--fh);margin:0 0 6px;font-size:20px}
+.sheet p{color:var(--mut);margin:0 0 16px;font-size:14.5px}
+.sheet .btn+.btn{margin-top:8px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="run" hidden></div>
+<div id="toast" class="toast"></div>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ICON = {
+  play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5.5" y="4" width="4.5" height="16" rx="1.2"/><rect x="14" y="4" width="4.5" height="16" rx="1.2"/></svg>',
+  next: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 5.5v13a1 1 0 0 0 1.55.83L16 13v5a1 1 0 0 0 2 0V6a1 1 0 0 0-2 0v5L6.55 4.67A1 1 0 0 0 5 5.5z"/></svg>',
+  prev: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 5.5v13a1 1 0 0 1-1.55.83L8 13v5a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5l9.45-6.33A1 1 0 0 1 19 5.5z"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+};
+
+/* ---------- stockage ---------- */
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem('rt.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('rt.' + k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem('rt.' + k); } catch (e) {} },
+};
+const COLORS = ['#2FBF71', '#8FB3FF', '#F5A524', '#E5484D', '#7C6CF2', '#14B8A6', '#EC4899'];
+const uid = () => Math.random().toString(36).slice(2, 9);
+const DEFAULTS = [
+  { name: 'JJB 5 rounds × 2', prep: 10, work: 300, rest: 30, rounds: 5, sets: 2, setRest: 120, warn: 10, color: COLORS[0] },
+  { name: 'Sparring 6 min', prep: 10, work: 360, rest: 60, rounds: 6, sets: 1, setRest: 0, warn: 30, color: COLORS[1] },
+  { name: 'Drills 2 min', prep: 10, work: 120, rest: 15, rounds: 8, sets: 1, setRest: 0, warn: 0, color: COLORS[2] },
+  { name: 'Tabata 20/10', prep: 10, work: 20, rest: 10, rounds: 8, sets: 1, setRest: 0, warn: 0, color: COLORS[3] },
+  { name: 'Gainage 45/15', prep: 10, work: 45, rest: 15, rounds: 6, sets: 2, setRest: 60, warn: 0, color: COLORS[4] },
+].map(p => ({ id: uid(), ...p }));
+let presets = LS.get('presets', null);
+if (!Array.isArray(presets) || !presets.length) { presets = DEFAULTS; LS.set('presets', presets); }
+const SET = Object.assign({ sound: true, voice: true, countdown: true, vibrate: true, volume: 1 }, LS.get('settings', {}));
+const saveSet = () => LS.set('settings', SET);
+const savePresets = () => LS.set('presets', presets);
+
+/* ---------- format ---------- */
+function fmt(s) { s = Math.max(0, Math.round(s)); const m = Math.floor(s / 60), r = s % 60; return m + ':' + String(r).padStart(2, '0'); }
+function fmtLong(s) { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60; if (h) return h + ' h ' + String(m).padStart(2, '0'); if (m >= 10) return Math.round(s / 60) + ' min'; if (!r) return m + ' min'; return m ? m + ' min ' + String(r).padStart(2, '0') : r + ' s'; }
+
+/* ---------- plan d'une séance ---------- */
+function buildPlan(p) {
+  const steps = [];
+  if (p.prep > 0) steps.push({ type: 'prep', d: p.prep, round: 1, set: 1 });
+  for (let s = 1; s <= p.sets; s++) {
+    for (let r = 1; r <= p.rounds; r++) {
+      steps.push({ type: 'work', d: p.work, round: r, set: s });
+      const lastRound = r === p.rounds, lastSet = s === p.sets;
+      if (!lastRound && p.rest > 0) steps.push({ type: 'rest', d: p.rest, round: r, set: s });
+      if (lastRound && !lastSet && (p.setRest || p.rest) > 0) steps.push({ type: 'setrest', d: p.setRest || p.rest, round: r, set: s });
+    }
+  }
+  let t = 0; steps.forEach(st => { st.at = t; t += st.d; });
+  return { steps, total: t };
+}
+const PH = {
+  prep: { label: 'Prépare-toi', color: 'var(--prep)', voice: 'Prêt' },
+  work: { label: 'Combat', color: 'var(--work)', voice: 'Go' },
+  rest: { label: 'Repos', color: 'var(--rest)', voice: 'Repos' },
+  setrest: { label: 'Repos série', color: 'var(--setrest)', voice: 'Repos entre les séries' },
+};
+const workLabel = p => /tabata|gainage|circuit|drill/i.test(p.name) ? 'Travail' : 'Combat';
+
+/* ---------- audio ---------- */
+let actx = null, master = null;
+function setAudioSession(t) { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) {} }
+function unlockAudio() {
+  try {
+    if (!actx) {
+      actx = new (window.AudioContext || window.webkitAudioContext)();
+      const comp = actx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 6;
+      master = actx.createGain(); master.connect(comp); comp.connect(actx.destination);
+    }
+    if (actx.state !== 'running') actx.resume();
+    // tampon muet joué pendant le geste : débloque le son sur iOS
+    const b = actx.createBuffer(1, 1, 22050), s = actx.createBufferSource(); s.buffer = b; s.connect(actx.destination); s.start(0);
+  } catch (e) {}
+}
+let duckTimer = null;
+function tone(seq) {
+  if (!SET.sound) return;
+  setAudioSession('transient'); unlockAudio();
+  clearTimeout(duckTimer); duckTimer = setTimeout(() => setAudioSession('auto'), 2600);
+  try {
+    if (!actx) return; master.gain.value = SET.volume;
+    const t0 = actx.currentTime + 0.04;
+    seq.forEach(([at, f, dur, type, vol]) => {
+      const t = t0 + at, o = actx.createOscillator(), g = actx.createGain(), v = vol || 0.9;
+      o.type = type || 'square'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.012);
+      g.gain.setValueAtTime(v, t + Math.max(0.02, dur - 0.04)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g).connect(master); o.start(t); o.stop(t + dur + 0.02);
+    });
+  } catch (e) {}
+}
+// sonnerie de type cloche : plusieurs harmoniques qui décroissent
+function bell(times, gap) {
+  const seq = [];
+  for (let i = 0; i < times; i++) [[880, 1], [1760, .5], [2640, .3]].forEach(([f, v]) => seq.push([i * gap, f, 0.9, 'triangle', v]));
+  tone(seq);
+}
+const SOUND = {
+  tick: () => tone([[0, 1000, 0.12, 'square', 0.7]]),
+  go: () => { tone([[0, 1568, 0.55, 'square', 0.95], [0, 784, 0.55, 'square', 0.5]]); },
+  rest: () => bell(3, 0.32),
+  setrest: () => bell(2, 0.5),
+  warn: () => tone([[0, 1320, 0.09], [0.14, 1320, 0.09], [0.28, 1320, 0.09]]),
+  done: () => { bell(5, 0.3); },
+};
+function say(txt) {
+  if (!SET.voice || !SET.sound || !('speechSynthesis' in window)) return;
+  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(txt); u.lang = 'fr-FR'; u.rate = 1.05; u.volume = 1; speechSynthesis.speak(u); } catch (e) {}
+}
+function buzz(p) { if (!SET.vibrate) return; try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
+
+/* ---------- écran allumé ---------- */
+let wakeLock = null;
+async function keepAwake() { try { if ('wakeLock' in navigator && !wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); } } catch (e) {} }
+function releaseAwake() { try { wakeLock && wakeLock.release(); } catch (e) {} wakeLock = null; }
+
+/* ---------- moteur ---------- */
+// R = séance en cours : { pid, preset, base (s écoulées avant la reprise), startedAt (ms ou null si pause) }
+let R = null, plan = null, loop = null, lastIdx = -1, lastSec = null, lastWarn = -1;
+function elapsed() { return R.base + (R.startedAt ? (Date.now() - R.startedAt) / 1000 : 0); }
+function persist() { if (R) LS.set('run', R); else LS.del('run'); }
+function stepAt(e) { const st = plan.steps; for (let i = st.length - 1; i >= 0; i--) if (e >= st[i].at) return i; return 0; }
+
+function startRun(p) {
+  unlockAudio();
+  R = { pid: p.id, preset: JSON.parse(JSON.stringify(p)), base: 0, startedAt: Date.now() };
+  plan = buildPlan(R.preset); lastIdx = -1; lastSec = null; lastWarn = -1;
+  persist(); openRun();
+}
+function openRun() {
+  $('#run').hidden = false; document.body.style.overflow = 'hidden';
+  keepAwake(); renderRunShell(); tick(true);
+  clearInterval(loop); loop = setInterval(tick, 100);
+}
+function closeRun() {
+  clearInterval(loop); loop = null; R = null; plan = null; persist(); releaseAwake();
+  try { speechSynthesis.cancel(); } catch (e) {}
+  $('#run').hidden = true; $('#run').innerHTML = ''; document.body.style.overflow = ''; render();
+}
+function togglePause() {
+  unlockAudio();
+  if (!R || R.finished) return;
+  if (R.startedAt) { R.base = elapsed(); R.startedAt = null; releaseAwake(); }
+  else { R.startedAt = Date.now(); keepAwake(); }
+  persist(); tick(true);
+}
+function seek(e) {
+  R.base = Math.max(0, Math.min(e, plan.total)); if (R.startedAt) R.startedAt = Date.now();
+  lastSec = null; persist(); tick();
+}
+function skip() { unlockAudio(); if (!R || R.finished) return; const i = stepAt(elapsed()); if (i < plan.steps.length - 1) seek(plan.steps[i + 1].at); else finish(); }
+function prev() {
+  unlockAudio(); if (!R) return;
+  if (R.finished) { R.finished = false; R.startedAt = null; }
+  const e = Math.min(elapsed(), plan.total - 0.01), i = stepAt(e), st = plan.steps[i];
+  seek(e - st.at > 2 || i === 0 ? st.at : plan.steps[i - 1].at);
+}
+function finish() {
+  R.base = plan.total; R.startedAt = null; R.finished = true; persist();
+  SOUND.done(); say('Terminé, bien joué'); buzz([400, 150, 400, 150, 600]); flash();
+  releaseAwake(); renderRunShell(); tick(true);
+}
+function flash() { const el = $('#run'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1600); }
+
+function announce(st, i) {
+  const p = R.preset, last = st.type === 'work' && st.round === p.rounds;
+  if (st.type === 'work') {
+    SOUND.go(); buzz([500]);
+    if (p.rounds > 1) say(last ? (st.set === p.sets ? 'Dernier round' : 'Dernier round de la série') : 'Round ' + st.round);
+  } else if (st.type === 'rest') { SOUND.rest(); buzz([200, 100, 200, 100, 200]); say('Repos'); }
+  else if (st.type === 'setrest') { SOUND.setrest(); buzz([300, 150, 300]); say('Série ' + st.set + ' terminée. Repos'); }
+  else if (st.type === 'prep') { say('Prépare-toi'); }
+  if (i > 0) flash();
+}
+
+function tick(force) {
+  if (!R) return;
+  const e = elapsed();
+  if (!R.finished && e >= plan.total) { finish(); return; }
+  const i = R.finished ? plan.steps.length - 1 : stepAt(e), st = plan.steps[i];
+  const left = R.finished ? 0 : st.at + st.d - e, sec = Math.ceil(left - 0.001);
+  if (i !== lastIdx) {
+    // en revenant d'arrière-plan après plusieurs étapes, on n'annonce que l'étape actuelle
+    if (!R.finished) announce(st, i);
+    lastIdx = i; lastWarn = -1; renderRunShell();
+  } else if (R.startedAt && sec !== lastSec) {
+    const p = R.preset;
+    if (st.type === 'work' && p.warn > 0 && sec === p.warn && st.d > p.warn + 3 && lastWarn !== i) { lastWarn = i; SOUND.warn(); buzz([120, 80, 120]); say(p.warn >= 60 ? (p.warn / 60) + ' minute' + (p.warn >= 120 ? 's' : '') : p.warn + ' secondes'); }
+    else if (SET.countdown && sec >= 1 && sec <= 3 && st.d >= 5 && lastSec !== null) { SOUND.tick(); buzz([60]); }
+  }
+  lastSec = sec;
+  paintRun(e, i, st, left, force);
+}
+
+function renderRunShell() {
+  const el = $('#run'), p = R.preset;
+  el.classList.toggle('paused', !R.startedAt && !R.finished);
+  if (R.finished) {
+    el.style.setProperty('--phase', '#1B2433');
+    el.innerHTML = `<div class="rtop"><div class="nm">${esc(p.name)}</div><button class="rib" data-a="close" aria-label="Fermer">${ICON.close}</button></div>
+      <div class="rmid"><div class="done-ttl">Terminé 💪</div><div class="next">${p.rounds * p.sets} rounds · ${fmtLong(plan.total)}</div></div>
+      <div class="rctl"><button data-a="prev" aria-label="Revenir">${ICON.prev}</button><button class="big" data-a="again" aria-label="Recommencer">${ICON.play}</button><button data-a="close" aria-label="Fermer">${ICON.close}</button></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="rtop"><button class="rib" data-a="stop" aria-label="Arrêter">${ICON.close}</button><div class="nm">${esc(p.name)}</div><button class="rib" data-a="sound" aria-label="Son" id="sndb">${ICON.sound}</button></div>
+    <div class="rmid"><div class="phase" id="rphase"></div><div class="clock" id="rclock">0:00</div><div class="counts" id="rcounts"></div><div class="next" id="rnext"></div></div>
+    <div class="pbar"><i id="rbar"></i></div><div class="rinfo"><span id="rel"></span><span id="rrem"></span></div>
+    <div class="rctl"><button data-a="prev" aria-label="Précédent">${ICON.prev}</button><button class="big" data-a="pause" id="rpp" aria-label="Pause">${ICON.pause}</button><button data-a="skip" aria-label="Suivant">${ICON.next}</button></div>`;
+  $('#sndb').style.opacity = SET.sound ? 1 : .45;
+}
+let lastPaint = '';
+function paintRun(e, i, st, left, force) {
+  if (R.finished) return;
+  const p = R.preset, sec = Math.ceil(left - 0.001);
+  const key = i + '|' + sec + '|' + !!R.startedAt;
+  $('#rbar').style.width = (100 * Math.min(1, (e - st.at) / st.d)).toFixed(2) + '%';
+  if (key === lastPaint && !force) return; lastPaint = key;
+  $('#run').style.setProperty('--phase', PH[st.type].color);
+  $('#run').classList.toggle('paused', !R.startedAt);
+  $('#rphase').textContent = st.type === 'work' ? workLabel(p) : PH[st.type].label;
+  $('#rclock').textContent = fmt(sec);
+  $('#rcounts').innerHTML = `<span class="pill"><small>Round</small> ${st.type === 'prep' ? 0 : st.round}/${p.rounds}</span>` + (p.sets > 1 ? `<span class="pill"><small>Série</small> ${st.set}/${p.sets}</span>` : '');
+  const nx = plan.steps[i + 1];
+  $('#rnext').textContent = nx ? 'Ensuite : ' + (nx.type === 'work' ? workLabel(p) + ' ' + fmt(nx.d) : PH[nx.type].label + ' ' + fmt(nx.d)) : 'Dernière ligne droite';
+  $('#rel').textContent = fmt(e);
+  $('#rrem').textContent = '-' + fmt(plan.total - e);
+  $('#rpp').innerHTML = R.startedAt ? ICON.pause : ICON.play;
+}
+$('#run').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-a]'); if (!b) return;
+  const a = b.dataset.a;
+  if (a === 'pause') togglePause();
+  else if (a === 'skip') skip();
+  else if (a === 'prev') prev();
+  else if (a === 'sound') { SET.sound = !SET.sound; saveSet(); b.style.opacity = SET.sound ? 1 : .45; toast(SET.sound ? 'Son activé' : 'Son coupé'); }
+  else if (a === 'close') closeRun();
+  else if (a === 'again') { const p = R.preset; startRun(p); }
+  else if (a === 'stop') confirmSheet('Arrêter la séance ?', 'Le minuteur sera remis à zéro.', 'Arrêter', closeRun);
+});
+// tap n'importe où sur le chrono = pause / reprise
+document.addEventListener('click', ev => { if (ev.target.closest('#rclock')) togglePause(); });
+document.addEventListener('visibilitychange', () => {
+  if (!R) return;
+  if (document.visibilityState === 'visible') { if (R.startedAt) keepAwake(); unlockAudio(); tick(true); }
+});
+
+/* ---------- écrans ---------- */
+let view = 'home', draft = null;
+function summary(p) {
+  const pl = buildPlan(p);
+  return `<b>${p.rounds} × ${fmt(p.work)}</b>${p.rest ? ' / ' + fmt(p.rest) + ' repos' : ''}${p.sets > 1 ? ' · <b>' + p.sets + ' séries</b>' : ''} · ${fmtLong(pl.total)}`;
+}
+function render() {
+  const app = $('#app');
+  if (view === 'home') {
+    app.innerHTML = `<div class="wrap">
+      <div class="top"><div class="t" style="flex:1"></div><button class="ib" data-a="settings" aria-label="Réglages">${ICON.gear}</button></div>
+      <h1>Round Timer</h1><p class="sub">Choisis un minuteur ou crée le tien.</p>
+      ${presets.map(p => `<div class="card"><span class="dot" style="background:${esc(p.color)}"></span><div class="info" data-a="edit" data-id="${p.id}"><div class="nm">${esc(p.name)}</div><div class="meta">${summary(p)}</div></div>
+        <button class="ib" data-a="edit" data-id="${p.id}" aria-label="Modifier">${ICON.edit}</button><button class="ib play" data-a="start" data-id="${p.id}" aria-label="Lancer">${ICON.play}</button></div>`).join('')}
+      <div class="tip"><b>Astuce iPhone :</b> laisse l'appli ouverte pendant la séance (l'écran reste allumé). Si elle passe en arrière-plan, le chrono continue mais les bips reprennent seulement quand tu reviens.</div>
+    </div>
+    <div class="fab"><button class="btn pri" data-a="new">${ICON.plus.replace('<svg', '<svg width="20" height="20"')} Nouveau minuteur</button></div>`;
+  } else if (view === 'edit') {
+    const d = draft, pl = buildPlan(d), isNew = !presets.some(p => p.id === d.id);
+    const f = (k, lb, hint, kind, color) => `<div class="field">${color ? `<span class="bar" style="background:${color}"></span>` : ''}<div class="lb"><div>${lb}</div>${hint ? `<div>${hint}</div>` : ''}</div>
+      <div class="step"><button data-step="${k}" data-dir="-1" aria-label="Moins">−</button><div class="v">${kind === 't' ? (d[k] ? fmt(d[k]) : 'Off') : d[k]}</div><button data-step="${k}" data-dir="1" aria-label="Plus">+</button></div></div>`;
+    const cmap = { prep: '#F5A524', work: '#2FBF71', rest: '#E5484D', setrest: '#7C6CF2' };
+    app.innerHTML = `<div class="wrap">
+      <div class="top"><button class="ib" data-a="home" aria-label="Retour">${ICON.back}</button><div class="t">${isNew ? 'Nouveau minuteur' : 'Modifier'}</div></div>
+      <input class="namein" id="nm" value="${esc(d.name)}" placeholder="Nom (ex. JJB 5 rounds)" maxlength="40">
+      <div class="colors">${COLORS.map(c => `<button data-color="${c}" class="${c === d.color ? 'on' : ''}" style="background:${c}" aria-label="Couleur"></button>`).join('')}</div>
+      <div class="sec">Rounds</div>
+      ${f('work', 'Travail', 'Durée d\'un round', 't', cmap.work)}
+      ${f('rest', 'Repos', 'Entre deux rounds', 't', cmap.rest)}
+      ${f('rounds', 'Rounds', 'Par série', 'n')}
+      <div class="sec">Séries</div>
+      ${f('sets', 'Séries', 'Nombre de fois qu\'on répète les rounds', 'n')}
+      ${d.sets > 1 ? f('setRest', 'Repos entre séries', 'Pause plus longue', 't', cmap.setrest) : ''}
+      <div class="sec">Signaux</div>
+      ${f('prep', 'Préparation', 'Avant le premier round', 't', cmap.prep)}
+      ${f('warn', 'Alerte avant la fin', 'Double bip + voix (ex. « 10 secondes »)', 't')}
+      <div class="tl">${pl.steps.map(s => `<i style="flex:${s.d};background:${cmap[s.type]}"></i>`).join('')}</div>
+      <div class="total"><span>Durée totale</span><b>${fmtLong(pl.total)}</b></div>
+      <div style="margin-top:22px">${isNew ? '' : `<div class="row2"><button class="btn" data-a="dup">Dupliquer</button><button class="btn danger" data-a="del">Supprimer</button></div>`}</div>
+    </div>
+    <div class="fab"><div class="row2"><button class="btn" data-a="save">Enregistrer</button><button class="btn pri" data-a="savestart">${ICON.play.replace('<svg', '<svg width="20" height="20"')} Lancer</button></div></div>`;
+    $('#nm').addEventListener('input', e => { draft.name = e.target.value; });
+  } else if (view === 'settings') {
+    const s = (k, lb, hint) => `<div class="sw"><div class="lb"><div>${lb}</div>${hint ? `<div>${hint}</div>` : ''}</div><button class="tg ${SET[k] ? 'on' : ''}" data-tg="${k}" aria-label="${lb}"></button></div>`;
+    app.innerHTML = `<div class="wrap">
+      <div class="top"><button class="ib" data-a="home" aria-label="Retour">${ICON.back}</button><div class="t">Réglages</div></div>
+      ${s('sound', 'Sons', 'Bips forts, la musique baisse pendant le signal')}
+      ${s('voice', 'Voix', '« Round 3 », « Repos », « 10 secondes »…')}
+      ${s('countdown', 'Bips 3-2-1', 'Les 3 dernières secondes de chaque phase')}
+      ${s('vibrate', 'Vibrations', 'Android seulement (l\'iPhone ne le permet pas aux applis web)')}
+      <div class="sec">Test</div>
+      <div class="row2"><button class="btn" data-a="t-go">Début round</button><button class="btn" data-a="t-rest">Repos</button><button class="btn" data-a="t-warn">Alerte</button></div>
+      <div class="tip"><b>Pas de son ?</b> Vérifie le bouton silencieux de l'iPhone et le volume. Avec les AirPods, la musique baisse un instant pendant chaque bip puis remonte.</div>
+      <div class="sec">Minuteurs</div>
+      <button class="btn" data-a="reset">Remettre les minuteurs d'exemple</button>
+    </div>`;
+  }
+}
+const STEPS = {
+  work: v => v < 60 ? 5 : v < 300 ? 15 : 30, rest: v => v < 60 ? 5 : v < 300 ? 15 : 30, setRest: v => v < 60 ? 5 : v < 300 ? 15 : 30,
+  prep: v => 5, warn: v => v < 30 ? 5 : v < 60 ? 10 : 30, rounds: () => 1, sets: () => 1,
+};
+const LIM = { work: [5, 3600], rest: [0, 1800], setRest: [0, 1800], prep: [0, 120], warn: [0, 600], rounds: [1, 50], sets: [1, 20] };
+function stepVal(k, dir) {
+  const v = draft[k]; let inc = STEPS[k](dir > 0 ? v : Math.max(0, v - 1));
+  let n = dir > 0 ? Math.floor(v / inc) * inc + inc : Math.ceil(v / inc) * inc - inc;
+  n = Math.max(LIM[k][0], Math.min(LIM[k][1], n)); if (n === v) return false; draft[k] = n; return true;
+}
+// appui long sur + / − : répétition
+let holdT = null, holdI = null;
+function stopHold() { clearTimeout(holdT); clearInterval(holdI); holdT = holdI = null; }
+document.addEventListener('pointerdown', ev => {
+  const b = ev.target.closest('[data-step]'); if (!b) return; ev.preventDefault();
+  const k = b.dataset.step, dir = +b.dataset.dir;
+  const go = () => { if (stepVal(k, dir)) { const y = scrollY; render(); scrollTo(0, y); } };
+  go(); stopHold();
+  holdT = setTimeout(() => { holdI = setInterval(go, 90); }, 420);
+});
+['pointerup', 'pointercancel', 'pointerleave'].forEach(t => document.addEventListener(t, stopHold));
+
+$('#app').addEventListener('click', ev => {
+  const c = ev.target.closest('[data-color]'); if (c) { draft.color = c.dataset.color; render(); return; }
+  const tg = ev.target.closest('[data-tg]'); if (tg) { const k = tg.dataset.tg; SET[k] = !SET[k]; saveSet(); tg.classList.toggle('on', SET[k]); if (k === 'sound' && SET.sound) { unlockAudio(); SOUND.go(); } return; }
+  const b = ev.target.closest('[data-a]'); if (!b) return;
+  const a = b.dataset.a, p = presets.find(x => x.id === b.dataset.id);
+  if (a === 'start' && p) startRun(p);
+  else if (a === 'edit' && p) { draft = JSON.parse(JSON.stringify(p)); view = 'edit'; render(); scrollTo(0, 0); }
+  else if (a === 'new') { draft = { id: uid(), name: '', prep: 10, work: 300, rest: 60, rounds: 5, sets: 1, setRest: 120, warn: 10, color: COLORS[presets.length % COLORS.length] }; view = 'edit'; render(); scrollTo(0, 0); }
+  else if (a === 'home') { view = 'home'; render(); }
+  else if (a === 'settings') { view = 'settings'; render(); }
+  else if (a === 'save' || a === 'savestart') {
+    if (!draft.name.trim()) draft.name = `${draft.rounds} × ${fmt(draft.work)}`;
+    const i = presets.findIndex(x => x.id === draft.id); if (i >= 0) presets[i] = draft; else presets.push(draft);
+    savePresets(); const d = draft; view = 'home'; render();
+    if (a === 'savestart') startRun(d); else toast('Enregistré');
+  }
+  else if (a === 'dup') { const d = { ...draft, id: uid(), name: draft.name + ' (copie)' }; presets.push(d); savePresets(); draft = JSON.parse(JSON.stringify(d)); render(); toast('Copie créée'); }
+  else if (a === 'del') confirmSheet('Supprimer ce minuteur ?', esc(draft.name), 'Supprimer', () => { presets = presets.filter(x => x.id !== draft.id); savePresets(); view = 'home'; render(); });
+  else if (a === 'reset') confirmSheet('Remettre les exemples ?', 'Tes minuteurs actuels seront remplacés par ceux d\'exemple.', 'Remettre', () => { presets = DEFAULTS.map(p => ({ ...p, id: uid() })); savePresets(); view = 'home'; render(); toast('Exemples remis'); });
+  else if (a === 't-go') { unlockAudio(); SOUND.go(); setTimeout(() => say('Round 1'), 600); }
+  else if (a === 't-rest') { unlockAudio(); SOUND.rest(); }
+  else if (a === 't-warn') { unlockAudio(); SOUND.warn(); setTimeout(() => say('10 secondes'), 500); }
+});
+
+function confirmSheet(title, msg, label, fn) {
+  const bg = document.createElement('div'); bg.className = 'sheet-bg';
+  bg.innerHTML = `<div class="sheet"><h3>${esc(title)}</h3><p>${msg}</p><button class="btn danger" data-x="ok">${esc(label)}</button><button class="btn" data-x="no">Annuler</button></div>`;
+  bg.addEventListener('click', e => { const x = e.target.closest('[data-x]'); if (e.target === bg || x) { bg.remove(); if (x && x.dataset.x === 'ok') fn(); } });
+  document.body.appendChild(bg);
+}
+let toastT = null;
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 1800); }
+
+/* ---------- démarrage ---------- */
+render();
+// reprise d'une séance interrompue (appli fermée par iOS, rechargement…)
+(() => {
+  const r = LS.get('run', null);
+  if (!r || !r.preset) return;
+  R = r; plan = buildPlan(R.preset);
+  if (R.finished || elapsed() >= plan.total + 600) { R = null; plan = null; persist(); return; }
+  lastIdx = stepAt(Math.min(elapsed(), plan.total - 0.01)); openRun(); renderRunShell(); tick(true);
+})();
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>

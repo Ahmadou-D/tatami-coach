@@ -8,3 +8,7 @@ Appli de coaching perso (journée, nutrition, muscu, corps, motivation) qui s'in
 - Rappels : `.github/workflows/reminders.yml` envoie les notifications listées dans `reminders.json`.
 
 `index.html` est généré à partir de la source commune de l'appli ; ne pas le modifier à la main.
+
+## Round Timer (`timer/`)
+
+Timer d'intervalles gratuit (rounds, travail/repos, séries, préréglages), appli séparée installable depuis Safari : https://ahmadou-d.github.io/tatami-coach/timer/

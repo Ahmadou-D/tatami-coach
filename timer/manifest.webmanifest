@@ -1,0 +1,17 @@
+{
+  "name": "Round Timer",
+  "short_name": "Rounds",
+  "description": "Timer d'intervalles gratuit : rounds, travail, repos, séries.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0D1015",
+  "theme_color": "#0D1015",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
