@@ -167,6 +167,8 @@ svg.ic{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;strok
 #scan .box{position:absolute;left:10%;right:10%;top:28%;height:22%;border:3px solid var(--acc,#8ab4ff);border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.35);pointer-events:none}
 #scan .bar{background:var(--bg);padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
 #scan .bar .row{display:flex;gap:8px}#scan .bar input{flex:1}
+@keyframes restflash{0%,100%{box-shadow:inset 0 0 0 0 transparent}50%{box-shadow:inset 0 0 0 9px var(--acc)}}
+#session.flash{animation:restflash .6s ease-in-out 3}
 </style>
 
 <div id="view" aria-live="polite"></div>
@@ -556,7 +558,8 @@ const Store = {
     try { this.docs = JSON.parse(localStorage.getItem('tc.docs') || '{}') || {}; this.pending = new Set(JSON.parse(localStorage.getItem('tc.pending') || '[]')); } catch (e) { this.docs = {}; }
   },
   _t: 0,
-  persist() { clearTimeout(this._t); this._t = setTimeout(() => { try { localStorage.setItem('tc.docs', JSON.stringify(this.docs)); localStorage.setItem('tc.pending', JSON.stringify([...this.pending])); } catch (e) {} }, 150); },
+  persist() { clearTimeout(this._t); this._t = setTimeout(() => this.flush(), 150); },
+  flush() { clearTimeout(this._t); try { localStorage.setItem('tc.docs', JSON.stringify(this.docs)); localStorage.setItem('tc.pending', JSON.stringify([...this.pending])); } catch (e) {} },
   get(id) { return this.docs[id]; },
   set(id, data) { this.docs[id] = data; this.pending.add(id); this.persist(); if (this.col) this.push(id); },
   del(id) { delete this.docs[id]; this.pending.add(id); this.persist(); if (this.col) this.push(id); },
@@ -675,7 +678,7 @@ async function pushKeys() {
 }
 function b64uToU8(s) { const pad = '='.repeat((4 - s.length % 4) % 4); const b = atob((s + pad).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, c => c.charCodeAt(0)); }
 async function connect() {
-  if (!IS_ARTIFACT) { initStandalone(); scheduleRender(); return; }
+  if (!IS_ARTIFACT) { initStandalone(); scheduleRender(); if (active()) setTimeout(openSession, 0); return; }
   setSync('slow');
   const [db, user] = await Promise.all([claude.use('db'), claude.use('user')]);
   const uid = user ? await user.id().catch(() => null) : null;
@@ -1211,9 +1214,25 @@ function sessionTick() {
 }
 let actx = null;
 function unlockAudio() { try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume(); } catch (e) {} }
+function setAudioSession(type) { try { if (navigator.audioSession) navigator.audioSession.type = type; } catch (e) {} }
 function beep() {
-  try { if (!actx) return; const t0 = actx.currentTime; [0, 0.25, 0.5].forEach((d, i) => { const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = i === 2 ? 1320 : 880; g.gain.setValueAtTime(0.0001, t0 + d); g.gain.exponentialRampToValueAtTime(0.35, t0 + d + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d + 0.18); o.connect(g).connect(actx.destination); o.start(t0 + d); o.stop(t0 + d + 0.2); }); } catch (e) {}
-  try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {}
+  // iOS : « transient » baisse la musique (AirPods compris) le temps du signal
+  setAudioSession('transient'); unlockAudio();
+  try {
+    if (!actx) return; const t0 = actx.currentTime + 0.05;
+    const comp = actx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 6;
+    const master = actx.createGain(); master.gain.value = 1; master.connect(comp); comp.connect(actx.destination);
+    // 3 doubles bips aigus, en onde carrée (plus perçante), sur 1,8 s
+    [0, 0.6, 1.2].forEach(d => [0, 0.16].forEach((dd, j) => {
+      const t = t0 + d + dd, o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'square'; o.frequency.value = j ? 1760 : 1320;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.9, t + 0.01); g.gain.setValueAtTime(0.9, t + 0.11); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+      o.connect(g).connect(master); o.start(t); o.stop(t + 0.15);
+    }));
+  } catch (e) {}
+  setTimeout(() => setAudioSession('auto'), 2500);
+  try { navigator.vibrate && navigator.vibrate([300, 120, 300, 120, 300]); } catch (e) {}
+  const el = $('#session'); if (el) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1800); }
 }
 function finishSession() {
   const a = active(); if (!a) return;
@@ -1714,7 +1733,8 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', e => { const t = e.target; if (t.dataset && t.dataset.in === 'rtp') UI.sheet.r.items[+t.dataset.x].rest = +t.value; });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.sheet) { closeSheet(); render(); } });
-document.addEventListener('visibilitychange', () => { if (!document.hidden && active() && !$('#session').hidden) { requestWake(); sessionTick(); } });
+window.addEventListener('pagehide', () => Store.flush());
+document.addEventListener('visibilitychange', () => { if (document.hidden) Store.flush(); if (!document.hidden && active() && !$('#session').hidden) { unlockAudio(); requestWake(); sessionTick(); } });
 
 /* ========== démarrage ========== */
 Store.load();
